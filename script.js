@@ -74,4 +74,60 @@ function deleteSample(id) {
 // 🔹 Laad samples bij opstarten
 window.onload = loadSamples;
 
-console.log("✅ script.js is geladen!");
+// 🔹 Firebase Authentication Initialiseren
+const auth = firebase.auth();
+
+// 🔹 Gebruiker Registreren
+function register() {
+    let email = document.getElementById("email").value;
+    let password = document.getElementById("password").value;
+
+    auth.createUserWithEmailAndPassword(email, password)
+        .then(userCredential => {
+            alert("✅ Registratie succesvol! Je bent ingelogd.");
+            checkUser();
+        })
+        .catch(error => {
+            alert("❌ Fout bij registreren: " + error.message);
+        });
+}
+
+// 🔹 Gebruiker Inloggen
+function login() {
+    let email = document.getElementById("email").value;
+    let password = document.getElementById("password").value;
+
+    auth.signInWithEmailAndPassword(email, password)
+        .then(userCredential => {
+            alert("✅ Inloggen succesvol!");
+            checkUser();
+        })
+        .catch(error => {
+            alert("❌ Fout bij inloggen: " + error.message);
+        });
+}
+
+// 🔹 Gebruiker Uitloggen
+function logout() {
+    auth.signOut().then(() => {
+        alert("✅ Uitgelogd!");
+        checkUser();
+    });
+}
+
+// 🔹 Check of een gebruiker ingelogd is
+function checkUser() {
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            document.getElementById("userStatus").innerText = `✅ Ingelogd als: ${user.email}`;
+            document.getElementById("authSection").style.display = "none"; // Verberg login-formulier
+        } else {
+            document.getElementById("userStatus").innerText = "❌ Niet ingelogd";
+            document.getElementById("authSection").style.display = "block"; // Toon login-formulier
+        }
+    });
+}
+
+// 🔹 Controleer automatisch bij opstarten of gebruiker ingelogd is
+checkUser();
+
