@@ -120,7 +120,7 @@ window.addSample = function () {
         return;
     }
 
-    db.collection("samples").add({
+    window.db.collection("samples").add({
         name: name,
         age: age,
         type: type,
