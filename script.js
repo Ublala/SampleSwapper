@@ -10,7 +10,7 @@ const firebaseConfig = {
 
 // 🔹 Firebase Initialiseren
 firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+const db = firebase.firestore(); // Firestore Database gebruiken
 
 // 🔹 Sample Toevoegen aan Database
 function addSample() {
@@ -19,9 +19,10 @@ function addSample() {
     let type = document.getElementById("whiskyType").value;
     let value = document.getElementById("whiskyValue").value;
 
-    if(name === "" || age === "" || type === "" || value === "") {alert("Vul alle velden in!");
-                                                                  return;
-                                                                 }
+    if (name === "" || age === "" || type === "" || value === "") {
+        alert("Vul alle velden in!");
+        return;
+    }
 
     db.collection("samples").add({
         name: name,
@@ -31,25 +32,25 @@ function addSample() {
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
     }).then(() => {
         alert("Sample toegevoegd!");
-        loadSamples(); // Herlaad de lijst
+        loadSamples(); // Samples herladen
     }).catch(error => {
         console.error("Fout bij toevoegen: ", error);
-});
+    });
 }
 
-// 🔹 Samples Ophalen uit Database
+// 🔹 Samples Ophalen uit Database en Weergeven
 function loadSamples() {
-    document.getElementById("sampleList").innerHTML = "";
+    document.getElementById("sampleList").innerHTML = ""; // Lijst leegmaken
 
     db.collection("samples").orderBy("timestamp", "desc").get().then(snapshot => {
         snapshot.forEach(doc => {
             let sample = doc.data();
             document.getElementById("sampleList").innerHTML += `
-                <div>
+                <div class="sample-card">
                     <h3>${sample.name} (${sample.age})</h3>
-                    <p>Type: ${sample.type}</p>
-                    <p>Waarde: ${sample.value}</p>
-                    <hr>
+                    <p><strong>Type:</strong> ${sample.type}</p>
+                    <p><strong>Waarde:</strong> ${sample.value}</p>
+                    <button onclick="deleteSample('${doc.id}')">Verwijderen</button>
                 </div>
             `;
         });
@@ -66,7 +67,7 @@ function deleteSample(id) {
     });
 }
 
-// 🔹 Laad samples bij start
+// 🔹 Laad samples bij opstarten
 window.onload = loadSamples;
 
 console.log("Script.js is geladen!");
