@@ -68,3 +68,5 @@ function deleteSample(id) {
 
 // 🔹 Laad samples bij start
 window.onload = loadSamples;
+
+console.log("Script.js is geladen!");
