@@ -79,6 +79,17 @@ document.addEventListener("DOMContentLoaded", function () {
     checkUser();
 });
 
+    // 🔹 Uitloggen
+
+window.logout = function () {
+    auth.signOut().then(() => {
+        alert("✅ Uitgelogd!");
+        checkUser();
+    }).catch(error => {
+        console.error("❌ Fout bij uitloggen:", error);
+    });
+};
+
 // 🔹 Sample Toevoegen aan Database
 function addSample() {
     let name = document.getElementById("whiskyName").value;
