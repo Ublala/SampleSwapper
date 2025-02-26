@@ -79,10 +79,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
 window.logout = function () {
     auth.signOut().then(() => {
-        alert("✅ Uitgelogd!");
-        checkUser();
+        alert("✅ Je bent succesvol uitgelogd!");
+        checkUser(); // Controleer opnieuw of gebruiker is uitgelogd
     }).catch(error => {
         console.error("❌ Fout bij uitloggen:", error);
+        alert("❌ Er ging iets mis bij het uitloggen.");
     });
 };
 
