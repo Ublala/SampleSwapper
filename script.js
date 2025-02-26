@@ -54,13 +54,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     };
 
-    // 🔹 Gebruiker Uitloggen
-    window.logout = function () {
-        auth.signOut().then(() => {
-            alert("✅ Uitgelogd!");
-            checkUser();
-        });
-    };
+
 
     // 🔹 Controleer of een gebruiker ingelogd is
     function checkUser() {
@@ -144,6 +138,14 @@ function deleteSample(id) {
         console.error("❌ Fout bij verwijderen: ", error);
     });
 }
+
+    // 🔹 Gebruiker Uitloggen
+    window.logout = function () {
+        auth.signOut().then(() => {
+            alert("✅ Uitgelogd!");
+            checkUser();
+        });
+    };
 
 // 🔹 Maak de functies beschikbaar voor HTML-knoppen
 window.register = register;
