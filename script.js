@@ -3,7 +3,7 @@ const firebaseConfig = {
     apiKey: "AIzaSyAhKPrwi66YsMtxnpeINOfVT0LC67KG5tw",
     authDomain: "sampleswapper.firebaseapp.com",
     projectId: "sampleswapper",
-    storageBucket: "sampleswapper.appspot.com", // ✅ Correctie
+    storageBucket: "sampleswapper.appspot.com",
     messagingSenderId: "30622034305",
     appId: "1:30622034305:web:c11d34889c902304e3e080"
 };
