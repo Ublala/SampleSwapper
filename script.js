@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // 🔹 Controleer automatisch bij opstarten of gebruiker ingelogd is
     checkUser();
 });
-
+    
     // 🔹 Uitloggen
 
 window.logout = function () {
