@@ -6,6 +6,7 @@ const firebaseConfig = {
     storageBucket: "sampleswapper.firebasestorage.app",
     messagingSenderId: "30622034305",
     appId: "1:30622034305:web:c11d34889c902304e3e080"
+    measurementId: "G-SM5C7KBWT4"
 };
 
 // 🔹 Firebase Initialiseren
