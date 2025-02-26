@@ -1,61 +1,64 @@
-// 🔹 Wacht tot Firebase is geladen voordat we `auth` en `db` gebruiken
-document.addEventListener("DOMContentLoaded", function () {
-    
-    // 🔹 Firebase Configuratie (vervang met jouw Firebase-config)
-    const firebaseConfig = {
-        apiKey: "AIzaSyAhKPrwi66YsMtxnpeINOfVT0LC67KG5tw",
-        authDomain: "sampleswapper.firebaseapp.com",
-        projectId: "sampleswapper",
-        storageBucket: "sampleswapper.appspot.com",
-        messagingSenderId: "30622034305",
-        appId: "1:30622034305:web:c11d34889c902304e3e080"
-    };
+// 🔹 Firebase Configuratie (vervang met jouw Firebase-config)
+const firebaseConfig = {
+    apiKey: "AIzaSyAhKPrwi66YsMtxnpeINOfVT0LC67KG5tw",
+    authDomain: "sampleswapper.firebaseapp.com",
+    projectId: "sampleswapper",
+    storageBucket: "sampleswapper.appspot.com",
+    messagingSenderId: "30622034305",
+    appId: "1:30622034305:web:c11d34889c902304e3e080"
+};
 
-    // 🔹 Firebase Initialiseren
-    firebase.initializeApp(firebaseConfig);
+// 🔹 Firebase Initialiseren
+firebase.initializeApp(firebaseConfig);
 
-    // 🔹 Firebase Services Initialiseren
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+// 🔹 Firebase Services Globaal Beschikbaar Maken
+window.auth = firebase.auth();
+window.db = firebase.firestore();
 
-    // 🔹 Debug: Controleer of Firebase correct is geladen
-    console.log("✅ Firebase is geladen:", firebase);
-    console.log("✅ Firestore Database:", db);
-    console.log("✅ Firebase Authentication:", auth);
+// 🔹 Debug: Controleer of Firebase correct is geladen
+console.log("✅ Firebase is geladen:", firebase);
+console.log("✅ Firestore Database:", db);
+console.log("✅ Firebase Authentication:", auth);
 
-    // 🔹 Gebruiker Registreren
-    window.register = function () {
-        let email = document.getElementById("email").value;
-        let password = document.getElementById("password").value;
+// 🔹 Gebruiker Registreren
+window.register = function () {
+    let email = document.getElementById("email").value;
+    let password = document.getElementById("password").value;
 
-        auth.createUserWithEmailAndPassword(email, password)
-            .then(userCredential => {
-                alert("✅ Registratie succesvol! Je bent ingelogd.");
-                checkUser();
-            })
-            .catch(error => {
-                console.error("❌ Fout bij registreren:", error);
-                alert("❌ Fout: " + error.message);
-            });
-    };
+    auth.createUserWithEmailAndPassword(email, password)
+        .then(userCredential => {
+            let user = userCredential.user;
+            user.sendEmailVerification()
+                .then(() => {
+                    alert("✅ Registratie succesvol! Verifieer je e-mail via de bevestigingsmail.");
+                    checkUser();
+                }).catch(error => {
+                    console.error("❌ Fout bij het verzenden van de verificatie e-mail:", error);
+                });
+        })
+        .catch(error => {
+            console.error("❌ Fout bij registreren:", error);
+            alert("❌ Fout: " + error.message);
+        });
+};
 
-    // 🔹 Gebruiker Inloggen
-    window.login = function () {
-        let email = document.getElementById("email").value;
-        let password = document.getElementById("password").value;
+// 🔹 Gebruiker Inloggen
+window.login = function () {
+    let email = document.getElementById("email").value;
+    let password = document.getElementById("password").value;
 
-        auth.signInWithEmailAndPassword(email, password)
-            .then(userCredential => {
-                alert("✅ Inloggen succesvol!");
-                checkUser();
-            })
-            .catch(error => {
-                console.error("❌ Fout bij inloggen:", error);
-                alert("❌ Fout: " + error.message);
-            });
-    };
+    auth.signInWithEmailAndPassword(email, password)
+        .then(userCredential => {
+            alert("✅ Inloggen succesvol!");
+            checkUser();
+        })
+        .catch(error => {
+            console.error("❌ Fout bij inloggen:", error);
+            alert("❌ Fout: " + error.message);
+        });
+};
 
-    // 🔹 Gebruiker Uitloggen
+// 🔹 Gebruiker Uitloggen
 window.logout = function () {
     auth.signOut().then(() => {
         alert("✅ Je bent succesvol uitgelogd!");
@@ -66,8 +69,8 @@ window.logout = function () {
     });
 };
 
-    // 🔹 Controleer of een gebruiker ingelogd is
-    function checkUser() {
+// 🔹 Controleer of een gebruiker ingelogd is
+window.checkUser = function () {
     auth.onAuthStateChanged(user => {
         if (user) {
             document.getElementById("userStatus").innerText = `✅ Ingelogd als: ${user.email}`;
@@ -79,9 +82,9 @@ window.logout = function () {
             document.getElementById("logoutButton").style.display = "none"; // Verberg uitlogknop
         }
     });
-}
+};
 
-    // 🔹 Wachtwoord Resetten
+// 🔹 Wachtwoord Resetten
 window.resetPassword = function () {
     let email = document.getElementById("email").value;
     if (!email) {
@@ -98,13 +101,15 @@ window.resetPassword = function () {
             alert("❌ Fout: " + error.message);
         });
 };
-    
-    // 🔹 Controleer automatisch bij opstarten of gebruiker ingelogd is
+
+// 🔹 Controleer automatisch bij opstarten of gebruiker ingelogd is
+window.onload = () => {
     checkUser();
-});
-    
+    loadSamples();
+};
+
 // 🔹 Sample Toevoegen aan Database
-function addSample() {
+window.addSample = function () {
     let name = document.getElementById("whiskyName").value;
     let age = document.getElementById("whiskyAge").value;
     let type = document.getElementById("whiskyType").value;
@@ -127,10 +132,10 @@ function addSample() {
     }).catch(error => {
         console.error("❌ Fout bij toevoegen: ", error);
     });
-}
+};
 
 // 🔹 Samples Ophalen uit Database en Weergeven
-function loadSamples() {
+window.loadSamples = function () {
     document.getElementById("sampleList").innerHTML = ""; // Lijst leegmaken
 
     db.collection("samples").orderBy("timestamp", "desc").get().then(snapshot => {
@@ -146,33 +151,14 @@ function loadSamples() {
             `;
         });
     });
-}
+};
 
 // 🔹 Sample Verwijderen uit Database
-function deleteSample(id) {
+window.deleteSample = function (id) {
     db.collection("samples").doc(id).delete().then(() => {
         alert("✅ Sample verwijderd!");
         loadSamples();
     }).catch(error => {
         console.error("❌ Fout bij verwijderen: ", error);
     });
-}
-
-    // 🔹 Gebruiker Uitloggen
-    window.logout = function () {
-        auth.signOut().then(() => {
-            alert("✅ Uitgelogd!");
-            checkUser();
-        });
-    };
-
-// 🔹 Maak de functies beschikbaar voor HTML-knoppen
-window.register = register;
-window.login = login;
-window.logout = logout;
-
-// 🔹 Laad samples bij opstarten
-window.onload = () => {
-    loadSamples();
-    checkUser();
 };
