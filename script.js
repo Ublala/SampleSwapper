@@ -19,6 +19,10 @@ function addSample() {
     let type = document.getElementById("whiskyType").value;
     let value = document.getElementById("whiskyValue").value;
 
+    if(name === "" || age === "" || type === "" || value === "") {alert("Vul alle velden in!");
+                                                                  return;
+                                                                 }
+
     db.collection("samples").add({
         name: name,
         age: age,
@@ -28,7 +32,9 @@ function addSample() {
     }).then(() => {
         alert("Sample toegevoegd!");
         loadSamples(); // Herlaad de lijst
-    });
+    }).catch(error => {
+        console.error("Fout bij toevoegen: ", error);
+});
 }
 
 // 🔹 Samples Ophalen uit Database
@@ -47,6 +53,16 @@ function loadSamples() {
                 </div>
             `;
         });
+    });
+}
+
+// 🔹 Sample Verwijderen uit Database
+function deleteSample(id) {
+    db.collection("samples").doc(id).delete().then(() => {
+        alert("Sample verwijderd!");
+        loadSamples();
+    }).catch(error => {
+        console.error("Fout bij verwijderen: ", error);
     });
 }
 
