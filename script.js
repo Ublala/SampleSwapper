@@ -127,6 +127,10 @@ function checkUser() {
         }
     });
 }
+// Maak de functies globaal beschikbaar
+window.register = register;
+window.login = login;
+window.logout = logout;
 
 // 🔹 Controleer automatisch bij opstarten of gebruiker ingelogd is
 checkUser();
