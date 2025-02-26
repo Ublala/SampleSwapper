@@ -1,77 +1,83 @@
-// 🔹 Firebase Configuratie (vervang deze met jouw Firebase-config)
-const firebaseConfig = {
-    apiKey: "AIzaSyAhKPrwi66YsMtxnpeINOfVT0LC67KG5tw",
-    authDomain: "sampleswapper.firebaseapp.com",
-    projectId: "sampleswapper",
-    storageBucket: "sampleswapper.appspot.com",
-    messagingSenderId: "30622034305",
-    appId: "1:30622034305:web:c11d34889c902304e3e080"
-};
+// 🔹 Wacht tot Firebase is geladen voordat we `auth` en `db` gebruiken
+document.addEventListener("DOMContentLoaded", function () {
+    // 🔹 Firebase Configuratie (vervang met jouw Firebase-config)
+    const firebaseConfig = {
+        apiKey: "AIzaSyAhKPrwi66YsMtxnpeINOfVT0LC67KG5tw",
+        authDomain: "sampleswapper.firebaseapp.com",
+        projectId: "sampleswapper",
+        storageBucket: "sampleswapper.appspot.com",
+        messagingSenderId: "30622034305",
+        appId: "1:30622034305:web:c11d34889c902304e3e080"
+    };
 
-// 🔹 Firebase Initialiseren (Correcte volgorde!)
-firebase.initializeApp(firebaseConfig);
+    // 🔹 Firebase Initialiseren
+    firebase.initializeApp(firebaseConfig);
 
-// 🔹 Firebase Services Initialiseren (Deze moeten DIRECT na de initialisatie staan)
-const auth = firebase.auth();
-const db = firebase.firestore();
+    // 🔹 Firebase Services Initialiseren
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-// 🔹 Debug: Controleer of Firebase correct is geladen
-console.log("✅ Firebase is geladen:", firebase);
-console.log("✅ Firestore Database:", db);
-console.log("✅ Firebase Authentication:", auth);
+    // 🔹 Debug: Controleer of Firebase correct is geladen
+    console.log("✅ Firebase is geladen:", firebase);
+    console.log("✅ Firestore Database:", db);
+    console.log("✅ Firebase Authentication:", auth);
 
-// 🔹 Gebruiker Registreren
-function register() {
-    let email = document.getElementById("email").value;
-    let password = document.getElementById("password").value;
+    // 🔹 Gebruiker Registreren
+    window.register = function () {
+        let email = document.getElementById("email").value;
+        let password = document.getElementById("password").value;
 
-    auth.createUserWithEmailAndPassword(email, password)
-        .then(userCredential => {
-            alert("✅ Registratie succesvol! Je bent ingelogd.");
+        auth.createUserWithEmailAndPassword(email, password)
+            .then(userCredential => {
+                alert("✅ Registratie succesvol! Je bent ingelogd.");
+                checkUser();
+            })
+            .catch(error => {
+                console.error("❌ Fout bij registreren:", error);
+                alert("❌ Fout: " + error.message);
+            });
+    };
+
+    // 🔹 Gebruiker Inloggen
+    window.login = function () {
+        let email = document.getElementById("email").value;
+        let password = document.getElementById("password").value;
+
+        auth.signInWithEmailAndPassword(email, password)
+            .then(userCredential => {
+                alert("✅ Inloggen succesvol!");
+                checkUser();
+            })
+            .catch(error => {
+                console.error("❌ Fout bij inloggen:", error);
+                alert("❌ Fout: " + error.message);
+            });
+    };
+
+    // 🔹 Gebruiker Uitloggen
+    window.logout = function () {
+        auth.signOut().then(() => {
+            alert("✅ Uitgelogd!");
             checkUser();
-        })
-        .catch(error => {
-            console.error("❌ Fout bij registreren:", error);
-            alert("❌ Fout: " + error.message);
         });
-}
+    };
 
-// 🔹 Gebruiker Inloggen
-function login() {
-    let email = document.getElementById("email").value;
-    let password = document.getElementById("password").value;
-
-    auth.signInWithEmailAndPassword(email, password)
-        .then(userCredential => {
-            alert("✅ Inloggen succesvol!");
-            checkUser();
-        })
-        .catch(error => {
-            console.error("❌ Fout bij inloggen:", error);
-            alert("❌ Fout: " + error.message);
+    // 🔹 Controleer of een gebruiker ingelogd is
+    function checkUser() {
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById("userStatus").innerText = `✅ Ingelogd als: ${user.email}`;
+                document.getElementById("authSection").style.display = "none"; // Verberg login-formulier
+            } else {
+                document.getElementById("userStatus").innerText = "❌ Niet ingelogd";
+                document.getElementById("authSection").style.display = "block"; // Toon login-formulier
+            }
         });
-}
+    }
 
-// 🔹 Gebruiker Uitloggen
-function logout() {
-    auth.signOut().then(() => {
-        alert("✅ Uitgelogd!");
-        checkUser();
-    });
-}
-
-// 🔹 Controleer of een gebruiker ingelogd is
-function checkUser() {
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            document.getElementById("userStatus").innerText = `✅ Ingelogd als: ${user.email}`;
-            document.getElementById("authSection").style.display = "none"; // Verberg login-formulier
-        } else {
-            document.getElementById("userStatus").innerText = "❌ Niet ingelogd";
-            document.getElementById("authSection").style.display = "block"; // Toon login-formulier
-        }
-    });
-}
+    // 🔹 Controleer automatisch bij opstarten of gebruiker ingelogd is
+    checkUser();
+});
 
 // 🔹 Sample Toevoegen aan Database
 function addSample() {
