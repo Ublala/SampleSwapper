@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SampleSwapper</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>SampleSwapper</h1>
+
+    <!-- Formulier om een sample toe te voegen -->
+    <div id="addSampleForm">
+        <input type="text" id="whiskyName" placeholder="Naam whisky">
+        <input type="text" id="whiskyAge" placeholder="Leeftijd">
+        <input type="text" id="whiskyType" placeholder="Type whisky">
+        <input type="text" id="whiskyValue" placeholder="Waarde (bijv. €10)">
+        <button onclick="addSample()">Voeg Sample Toe</button>
+    </div>
+
+    <h2>Beschikbare Samples</h2>
+    <div id="sampleList"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
