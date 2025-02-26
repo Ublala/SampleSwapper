@@ -16,11 +16,13 @@
     <input type="password" id="password" placeholder="Wachtwoord">
     <button onclick="register()">Registreer</button>
     <button onclick="login()">Login</button>
-    <button onclick="logout()">Uitloggen</button>
+    <button onclick="resetPassword()">Wachtwoord Vergeten?</button>
 </div>
 
-<p id="userStatus">Niet ingelogd</p>
+<!-- Uitlogknop apart van het registratieformulier -->
+<button id="logoutButton" onclick="logout()" style="display: none;">Uitloggen</button>
 
+<p id="userStatus">Niet ingelogd</p>
 
     <!-- Formulier om een sample toe te voegen -->
     <div id="addSampleForm">
