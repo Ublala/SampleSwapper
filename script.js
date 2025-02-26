@@ -58,16 +58,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 🔹 Controleer of een gebruiker ingelogd is
     function checkUser() {
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                document.getElementById("userStatus").innerText = `✅ Ingelogd als: ${user.email}`;
-                document.getElementById("authSection").style.display = "none"; // Verberg login-formulier
-            } else {
-                document.getElementById("userStatus").innerText = "❌ Niet ingelogd";
-                document.getElementById("authSection").style.display = "block"; // Toon login-formulier
-            }
-        });
-    }
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            document.getElementById("userStatus").innerText = `✅ Ingelogd als: ${user.email}`;
+            document.getElementById("authSection").style.display = "none"; // Verberg login-formulier
+            document.getElementById("logoutButton").style.display = "block"; // Toon uitlogknop
+        } else {
+            document.getElementById("userStatus").innerText = "❌ Niet ingelogd";
+            document.getElementById("authSection").style.display = "block"; // Toon login-formulier
+            document.getElementById("logoutButton").style.display = "none"; // Verberg uitlogknop
+        }
+    });
+}
 
     // 🔹 Controleer automatisch bij opstarten of gebruiker ingelogd is
     checkUser();
