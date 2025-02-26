@@ -1,5 +1,6 @@
 // 🔹 Wacht tot Firebase is geladen voordat we `auth` en `db` gebruiken
 document.addEventListener("DOMContentLoaded", function () {
+    
     // 🔹 Firebase Configuratie (vervang met jouw Firebase-config)
     const firebaseConfig = {
         apiKey: "AIzaSyAhKPrwi66YsMtxnpeINOfVT0LC67KG5tw",
@@ -54,7 +55,16 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     };
 
-
+    // 🔹 Gebruiker Uitloggen
+window.logout = function () {
+    auth.signOut().then(() => {
+        alert("✅ Je bent succesvol uitgelogd!");
+        checkUser();
+    }).catch(error => {
+        console.error("❌ Fout bij uitloggen:", error);
+        alert("❌ Er ging iets mis bij het uitloggen.");
+    });
+};
 
     // 🔹 Controleer of een gebruiker ingelogd is
     function checkUser() {
@@ -71,22 +81,28 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 }
 
+    // 🔹 Wachtwoord Resetten
+window.resetPassword = function () {
+    let email = document.getElementById("email").value;
+    if (!email) {
+        alert("⚠️ Voer je e-mailadres in om je wachtwoord te resetten.");
+        return;
+    }
+
+    auth.sendPasswordResetEmail(email)
+        .then(() => {
+            alert("📩 Wachtwoord reset e-mail is verzonden! Controleer je inbox.");
+        })
+        .catch(error => {
+            console.error("❌ Fout bij wachtwoord reset:", error);
+            alert("❌ Fout: " + error.message);
+        });
+};
+    
     // 🔹 Controleer automatisch bij opstarten of gebruiker ingelogd is
     checkUser();
 });
     
-    // 🔹 Uitloggen
-
-window.logout = function () {
-    auth.signOut().then(() => {
-        alert("✅ Je bent succesvol uitgelogd!");
-        checkUser(); // Controleer opnieuw of gebruiker is uitgelogd
-    }).catch(error => {
-        console.error("❌ Fout bij uitloggen:", error);
-        alert("❌ Er ging iets mis bij het uitloggen.");
-    });
-};
-
 // 🔹 Sample Toevoegen aan Database
 function addSample() {
     let name = document.getElementById("whiskyName").value;
