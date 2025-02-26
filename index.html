@@ -9,6 +9,19 @@
 <body>
     <h1>SampleSwapper</h1>
 
+    <!-- Gebruikersregistratie & Inloggen -->
+<div id="authSection">
+    <h2>Login of Registreer</h2>
+    <input type="email" id="email" placeholder="E-mail">
+    <input type="password" id="password" placeholder="Wachtwoord">
+    <button onclick="register()">Registreer</button>
+    <button onclick="login()">Login</button>
+    <button onclick="logout()">Uitloggen</button>
+</div>
+
+<p id="userStatus">Niet ingelogd</p>
+
+
     <!-- Formulier om een sample toe te voegen -->
     <div id="addSampleForm">
         <input type="text" id="whiskyName" placeholder="Naam whisky">
