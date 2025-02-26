@@ -24,6 +24,11 @@ button:hover {
     background-color: #cc7a00;
 }
 
-#sampleList {
-    margin-top: 20px;
+.sample-card {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin: 10px auto;
+    width: 80%;
+    max-width: 400px;
+    text-align: left;
 }
