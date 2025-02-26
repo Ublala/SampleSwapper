@@ -1,17 +1,20 @@
-// 🔹 Firebase Config (Vervang met jouw Firebase gegevens)
+// 🔹 Firebase Configuratie (vervang deze gegevens met jouw Firebase-config)
 const firebaseConfig = {
     apiKey: "AIzaSyAhKPrwi66YsMtxnpeINOfVT0LC67KG5tw",
     authDomain: "sampleswapper.firebaseapp.com",
     projectId: "sampleswapper",
-    storageBucket: "sampleswapper.firebasestorage.com",
+    storageBucket: "sampleswapper.appspot.com", // ✅ Correctie
     messagingSenderId: "30622034305",
     appId: "1:30622034305:web:c11d34889c902304e3e080"
-    
 };
 
 // 🔹 Firebase Initialiseren
 firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore(); // Firestore Database gebruiken
+const db = firebase.firestore();
+
+// 🔹 Debug check: Werkt Firebase correct?
+console.log("✅ Firebase is geladen:", firebase);
+console.log("✅ Firestore Database:", db);
 
 // 🔹 Sample Toevoegen aan Database
 function addSample() {
@@ -21,7 +24,7 @@ function addSample() {
     let value = document.getElementById("whiskyValue").value;
 
     if (name === "" || age === "" || type === "" || value === "") {
-        alert("Vul alle velden in!");
+        alert("⚠️ Vul alle velden in!");
         return;
     }
 
@@ -32,10 +35,10 @@ function addSample() {
         value: value,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
     }).then(() => {
-        alert("Sample toegevoegd!");
+        alert("✅ Sample toegevoegd!");
         loadSamples(); // Samples herladen
     }).catch(error => {
-        console.error("Fout bij toevoegen: ", error);
+        console.error("❌ Fout bij toevoegen: ", error);
     });
 }
 
@@ -61,14 +64,14 @@ function loadSamples() {
 // 🔹 Sample Verwijderen uit Database
 function deleteSample(id) {
     db.collection("samples").doc(id).delete().then(() => {
-        alert("Sample verwijderd!");
+        alert("✅ Sample verwijderd!");
         loadSamples();
     }).catch(error => {
-        console.error("Fout bij verwijderen: ", error);
+        console.error("❌ Fout bij verwijderen: ", error);
     });
 }
 
 // 🔹 Laad samples bij opstarten
 window.onload = loadSamples;
 
-console.log("Script.js is geladen!");
+console.log("✅ script.js is geladen!");
