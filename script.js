@@ -20,6 +20,12 @@ console.log("✅ Firebase is geladen:", firebase);
 console.log("✅ Firestore Database:", db);
 console.log("✅ Firebase Authentication:", auth);
 
+// 🔹 Functie om het tekstveld automatisch mee te laten groeien
+window.autoResize = function (element) {
+    element.style.height = "auto"; // Reset de hoogte eerst
+    element.style.height = (element.scrollHeight) + "px"; // Pas de hoogte aan
+};
+
 // 🔹 Gebruiker Registreren
 window.register = function () {
     let email = document.getElementById("email").value;
