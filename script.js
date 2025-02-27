@@ -147,17 +147,20 @@ window.addSample = function () {
 
 // 🔹 Samples Ophalen uit Database en Weergeven
 window.loadSamples = function () {
+    let user = auth.currentUser;
     document.getElementById("sampleList").innerHTML = ""; // Lijst leegmaken
 
-    db.collection("samples").orderBy("timestamp", "desc").get().then(snapshot => {
+    window.db.collection("samples").orderBy("timestamp", "desc").get().then(snapshot => {
         snapshot.forEach(doc => {
             let sample = doc.data();
+            let isOwner = user && sample.userId === user.uid; // ✅ Check of gebruiker eigenaar is
+
             document.getElementById("sampleList").innerHTML += `
                 <div class="sample-card">
-                    <h3>${sample.name} (${sample.age})</h3>
-                    <p><strong>Type:</strong> ${sample.type}</p>
+                    <h3>${sample.name} (${sample.age || "N/A"})</h3>
+                    <p><strong>Type:</strong> ${sample.type || "Onbekend"}</p>
                     <p><strong>Waarde:</strong> ${sample.value}</p>
-                    <button onclick="deleteSample('${doc.id}')">Verwijderen</button>
+                    ${isOwner ? `<button onclick="deleteSample('${doc.id}')">Verwijderen</button>` : ""}
                 </div>
             `;
         });
