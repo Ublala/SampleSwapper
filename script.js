@@ -152,6 +152,7 @@ window.addSample = function () {
     timestamp: firebase.firestore.FieldValue.serverTimestamp()
 };
 
+// Alleen opslaan als een veld daadwerkelijk is ingevuld
 if (age.trim() !== "") sampleData.age = age;
 if (type.trim() !== "") sampleData.type = type;
 if (whiskyBaseLink.trim() !== "") sampleData.whiskyBaseLink = whiskyBaseLink;
@@ -159,6 +160,7 @@ if (cask.trim() !== "") sampleData.cask = cask;
 if (notes.trim() !== "") sampleData.notes = notes;
 
 window.db.collection("samples").add(sampleData)
+    
 .then(() => {
         alert("✅ Sample toegevoegd!");
 
@@ -184,7 +186,6 @@ window.db.collection("samples").add(sampleData)
 
 
 // 🔹 Samples Ophalen uit Database en Weergeven
-// 🔹 Samples Ophalen uit Database en Weergeven
 window.loadSamples = function (user) {
     document.getElementById("sampleList").innerHTML = "";
 
@@ -195,22 +196,22 @@ window.loadSamples = function (user) {
 
             let sampleHTML = `<h3>${sample.name} ${sample.age ? `(${sample.age})` : ""}</h3>`;
 
-            if (sample.type && sample.type.trim() !== "") {
+            if (sample.type) {
                 sampleHTML += `<p><strong>Type:</strong> ${sample.type}</p>`;
             }
 
             sampleHTML += `<p><strong>Grootte:</strong> ${sample.size} cl</p>`; // Altijd tonen (verplicht veld)
             sampleHTML += `<p><strong>Waarde:</strong> ${sample.value}</p>`; // Altijd tonen (verplicht veld)
 
-            if (sample.cask && sample.cask.trim() !== "") {
+            if (sample.cask) {
                 sampleHTML += `<p><strong>Cask:</strong> ${sample.cask}</p>`;
             }
 
-            if (sample.notes && sample.notes.trim() !== "") {
+            if (sample.notes) {
                 sampleHTML += `<p><strong>Opmerkingen:</strong> ${sample.notes}</p>`;
             }
 
-            if (sample.whiskyBaseLink && sample.whiskyBaseLink.trim() !== "") {
+            if (sample.whiskyBaseLink) {
                 sampleHTML += `<p><a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer">Whiskybase</a></p>`;
             }
 
