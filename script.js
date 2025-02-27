@@ -155,24 +155,26 @@ window.addSample = function () {
 
 // 🔹 Samples Ophalen uit Database en Weergeven
 window.loadSamples = function (user) {
-    document.getElementById("sampleList").innerHTML = ""; // Lijst leegmaken
+    let sampleList = document.getElementById("sampleList");
+    sampleList.innerHTML = ""; // ✅ Leeg de lijst voordat we samples toevoegen
 
     window.db.collection("samples").orderBy("timestamp", "desc").get().then(snapshot => {
         snapshot.forEach(doc => {
             let sample = doc.data();
-            let isOwner = user && sample.userId === user.uid; // ✅ Controleer of de ingelogde gebruiker de eigenaar is
+            let isOwner = user && sample.userId === user.uid; // ✅ Check of gebruiker eigenaar is
 
             console.log(`📌 Sample: ${sample.name}, Eigenaar: ${sample.userId}, Huidige gebruiker: ${user ? user.uid : "Geen gebruiker"}`);
             console.log(`🛠 Is eigenaar? ${isOwner}`);
 
-            document.getElementById("sampleList").innerHTML += `
-                <div class="sample-card">
-                    <h3>${sample.name} (${sample.age || "N/A"})</h3>
-                    <p><strong>Type:</strong> ${sample.type || "Onbekend"}</p>
-                    <p><strong>Waarde:</strong> ${sample.value}</p>
-                    ${isOwner ? `<button onclick="deleteSample('${doc.id}')">Verwijderen</button>` : ""}
-                </div>
+            let sampleElement = document.createElement("div");
+            sampleElement.classList.add("sample-card");
+            sampleElement.innerHTML = `
+                <h3>${sample.name} (${sample.age || "N/A"})</h3>
+                <p><strong>Type:</strong> ${sample.type || "Onbekend"}</p>
+                <p><strong>Waarde:</strong> ${sample.value}</p>
+                ${isOwner ? `<button onclick="deleteSample('${doc.id}')">Verwijderen</button>` : ""}
             `;
+            sampleList.appendChild(sampleElement); // ✅ Voeg het sample toe aan de lijst
         });
     });
 };
