@@ -123,7 +123,6 @@ window.onload = () => {
 };
 
 // 🔹 Sample Toevoegen aan Database
-// 🔹 Sample Toevoegen aan Database
 window.addSample = function () {
     let user = auth.currentUser;
     if (!user) {
@@ -197,8 +196,6 @@ window.addSample = function () {
         });
 };
 
-
-// 🔹 Samples Ophalen uit Database en Weergeven
 // 🔹 Samples Ophalen uit Database en Weergeven
 window.loadSamples = function (user) {
     document.getElementById("sampleList").innerHTML = "";
@@ -220,7 +217,9 @@ window.loadSamples = function (user) {
             }
 
             sampleHTML += `<p><strong>Grootte:</strong> ${sample.size} cl</p>`; // Altijd tonen
-           sampleHTML += `<p><strong>Waarde:</strong> €${parseFloat(sample.value).toFixed(2)}</p>`;
+           let value = parseFloat(sample.value);
+sampleHTML += `<p><strong>Waarde:</strong> €${!isNaN(value) ? value.toFixed(2) : sample.value}</p>`;
+
 
             if (sample.cask) {
                 sampleHTML += `<p><strong>Cask:</strong> ${sample.cask}</p>`;
