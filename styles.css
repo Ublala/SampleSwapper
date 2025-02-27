@@ -40,7 +40,7 @@ button:hover {
 
 textarea {
     display: block; /* Zorgt ervoor dat het zich net als een input-veld gedraagt */
-    width: 80%; /* Zelfde breedte als inputvelden */
+    width: 100%; /* Zelfde breedte als inputvelden */
     max-width: 300px; /* Zelfde maximale breedte als inputvelden */
     padding: 10px;
     font-size: 16px;
