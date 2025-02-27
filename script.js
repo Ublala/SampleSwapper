@@ -118,7 +118,7 @@ window.onload = () => {
 
 // 🔹 Sample Toevoegen aan Database
 window.addSample = function () {
-    let user = auth.currentUser; // ✅ Controleer of een gebruiker is ingelogd
+    let user = auth.currentUser;
     if (!user) {
         alert("❌ Je moet ingelogd zijn om een sample toe te voegen.");
         return;
@@ -127,9 +127,13 @@ window.addSample = function () {
     let name = document.getElementById("whiskyName").value;
     let age = document.getElementById("whiskyAge").value;
     let type = document.getElementById("whiskyType").value;
+    let size = document.getElementById("whiskySize").value;
     let value = document.getElementById("whiskyValue").value;
+    let whiskyBaseLink = document.getElementById("whiskyBaseLink").value;
+    let cask = document.getElementById("whiskyCask").value;
+    let notes = document.getElementById("whiskyNotes").value;
 
-    if (name === "" || value === "") { // ✅ Alleen naam en waarde verplicht
+    if (name === "" || value === "") {
         alert("⚠️ Naam en prijs zijn verplicht!");
         return;
     }
@@ -138,22 +142,28 @@ window.addSample = function () {
         name: name,
         age: age || "N/A",
         type: type || "Onbekend",
+        size: size || "Onbekend",
         value: value,
-        userId: user.uid, // ✅ Sla de gebruiker-ID op
+        whiskyBaseLink: whiskyBaseLink || null,
+        cask: cask || "Onbekend",
+        notes: notes || "Geen opmerkingen",
+        userId: user.uid,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
     }).then(() => {
         alert("✅ Sample toegevoegd!");
 
-        // ✅ Velden resetten na toevoegen
+        // Velden resetten
         document.getElementById("whiskyName").value = "";
         document.getElementById("whiskyAge").value = "";
         document.getElementById("whiskyType").value = "";
-        document.getElementById("whiskyValue").value = ""; 
+        document.getElementById("whiskySize").value = "";
+        document.getElementById("whiskyValue").value = "";
+        document.getElementById("whiskyBaseLink").value = "";
+        document.getElementById("whiskyCask").value = "";
+        document.getElementById("whiskyNotes").value = "";
 
-        // ✅ Wacht even en laad samples opnieuw MET de juiste gebruiker
         auth.onAuthStateChanged(updatedUser => {
             if (updatedUser) {
-                console.log("🔄 Gebruiker opnieuw opgehaald:", updatedUser.uid);
                 loadSamples(updatedUser);
             }
         });
@@ -162,24 +172,28 @@ window.addSample = function () {
     });
 };
 
+
 // 🔹 Samples Ophalen uit Database en Weergeven
 window.loadSamples = function (user) {
-    document.getElementById("sampleList").innerHTML = ""; // ✅ Leeg de lijst voordat we samples toevoegen
+    document.getElementById("sampleList").innerHTML = "";
 
     window.db.collection("samples").orderBy("timestamp", "desc").get().then(snapshot => {
         snapshot.forEach(doc => {
             let sample = doc.data();
-            let isOwner = user && sample.userId === user.uid; // ✅ Check of gebruiker eigenaar is
+            let isOwner = user && sample.userId === user.uid;
 
-            console.log(`📌 Sample: ${sample.name}, Eigenaar: ${sample.userId}, Huidige gebruiker: ${user ? user.uid : "Geen gebruiker"}`);
-            console.log(`🛠 Is eigenaar? ${isOwner}`);
+            let whiskyBaseHTML = sample.whiskyBaseLink ? `<a href="${sample.whiskyBaseLink}" target="_blank">Whiskybase</a>` : "Geen link";
 
             let sampleElement = document.createElement("div");
             sampleElement.classList.add("sample-card");
             sampleElement.innerHTML = `
                 <h3>${sample.name} (${sample.age || "N/A"})</h3>
                 <p><strong>Type:</strong> ${sample.type || "Onbekend"}</p>
+                <p><strong>Grootte:</strong> ${sample.size || "Onbekend"} cl</p>
                 <p><strong>Waarde:</strong> ${sample.value}</p>
+                <p><strong>Vat:</strong> ${sample.cask || "Onbekend"}</p>
+                <p><strong>Opmerkingen:</strong> ${sample.notes || "Geen opmerkingen"}</p>
+                <p><strong>Whiskybase:</strong> ${whiskyBaseHTML}</p>
                 ${isOwner ? `<button onclick="deleteSample('${doc.id}')">Verwijderen</button>` : ""}
             `;
             document.getElementById("sampleList").appendChild(sampleElement);
