@@ -256,4 +256,4 @@ window.deleteSample = function (id) {
         console.error("❌ Fout bij verwijderen: ", error);
     });
 };
-}
+
