@@ -110,25 +110,36 @@ window.onload = () => {
 
 // 🔹 Sample Toevoegen aan Database
 window.addSample = function () {
+    let user = auth.currentUser; // ✅ Controleer of een gebruiker is ingelogd
+    if (!user) {
+        alert("❌ Je moet ingelogd zijn om een sample toe te voegen.");
+        return;
+    }
+
     let name = document.getElementById("whiskyName").value;
     let age = document.getElementById("whiskyAge").value;
     let type = document.getElementById("whiskyType").value;
     let value = document.getElementById("whiskyValue").value;
 
-    if (name === "" || age === "" || type === "" || value === "") {
-        alert("⚠️ Vul alle velden in!");
+    if (name === "" || value === "") { // ✅ Alleen naam en waarde verplicht
+        alert("⚠️ Naam en prijs zijn verplicht!");
         return;
     }
 
     window.db.collection("samples").add({
         name: name,
-        age: age,
-        type: type,
+        age: age || "N/A", // Niet verplicht
+        type: type || "Onbekend", // Niet verplicht
         value: value,
+        userId: user.uid, // ✅ Sla de gebruiker-ID op
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
     }).then(() => {
         alert("✅ Sample toegevoegd!");
-        loadSamples(); // Samples herladen
+        document.getElementById("whiskyName").value = "";
+        document.getElementById("whiskyAge").value = "";
+        document.getElementById("whiskyType").value = "";
+        document.getElementById("whiskyValue").value = ""; // ✅ Velden resetten na toevoegen
+        loadSamples();
     }).catch(error => {
         console.error("❌ Fout bij toevoegen: ", error);
     });
