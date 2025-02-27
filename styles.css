@@ -34,6 +34,12 @@ button:hover {
     background-color: #cc7a00;
 }
 
+#logoutButton {
+    position: absolute; /* Zet de knop op een vaste positie */
+    top: 20px; /* Afstand vanaf de bovenkant */
+    left: 20px; /* Plaats de knop aan de linkerkant */
+}
+
 .sample-card {
     border: 1px solid #ddd;
     padding: 10px;
@@ -45,20 +51,22 @@ button:hover {
 
 textarea {
     display: block;
-    width: 80%; /* Zelfde breedte als inputvelden */
-    max-width: 300px; /* Houdt de breedte gelijk aan de inputvelden */
+    width: 80%;
+    max-width: 300px;
     padding: 10px;
     font-size: 16px;
-    border: 1px solid #ccc; /* Zelfde rand als invoervelden */
+    font-family: inherit; /* Hiermee krijgt het hetzelfde lettertype als de rest */
+    border: 1px solid #ccc;
     border-radius: 5px;
-    resize: none; /* Voorkomt handmatige vergroting */
-    overflow-y: hidden; /* Scrollbar alleen als nodig */
-    min-height: 40px; /* Zelfde hoogte als inputvelden */
-    line-height: 1.5; /* Beter uitgelijnde tekst */
+    resize: none;
+    overflow-y: hidden;
+    min-height: 40px;
+    line-height: 1.5;
     box-sizing: border-box;
-    margin: 10px auto; /* Centreer net als inputvelden */
+    margin: 10px auto;
     background-color: white;
 }
+
 
 
 
