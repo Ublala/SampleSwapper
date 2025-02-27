@@ -144,19 +144,22 @@ window.addSample = function () {
     return;
 }
 
-
-    window.db.collection("samples").add({
+   let sampleData = {
     name: name,
-    age: age.trim() !== "" ? age : null,
-    type: type.trim() !== "" ? type : null,
-    size: size.trim(),
-    value: value.trim(),
-    whiskyBaseLink: whiskyBaseLink.trim() !== "" ? whiskyBaseLink : null,
-    cask: cask.trim() !== "" ? cask : null,
-    notes: notes.trim() !== "" ? notes : null,
+    size: size.trim(), // Altijd opslaan, verplicht veld
+    value: value.trim(), // Altijd opslaan, verplicht veld
     userId: user.uid,
     timestamp: firebase.firestore.FieldValue.serverTimestamp()
-}).then(() => {
+};
+
+if (age.trim() !== "") sampleData.age = age;
+if (type.trim() !== "") sampleData.type = type;
+if (whiskyBaseLink.trim() !== "") sampleData.whiskyBaseLink = whiskyBaseLink;
+if (cask.trim() !== "") sampleData.cask = cask;
+if (notes.trim() !== "") sampleData.notes = notes;
+
+window.db.collection("samples").add(sampleData)
+.then(() => {
         alert("✅ Sample toegevoegd!");
 
         // Velden resetten
@@ -181,6 +184,7 @@ window.addSample = function () {
 
 
 // 🔹 Samples Ophalen uit Database en Weergeven
+// 🔹 Samples Ophalen uit Database en Weergeven
 window.loadSamples = function (user) {
     document.getElementById("sampleList").innerHTML = "";
 
@@ -189,20 +193,35 @@ window.loadSamples = function (user) {
             let sample = doc.data();
             let isOwner = user && sample.userId === user.uid;
 
-            let whiskyBaseHTML = sample.whiskyBaseLink ? `<a href="${sample.whiskyBaseLink}" target="_blank">Whiskybase</a>` : "Geen link";
+            let sampleHTML = `<h3>${sample.name} ${sample.age ? `(${sample.age})` : ""}</h3>`;
+
+            if (sample.type && sample.type.trim() !== "") {
+                sampleHTML += `<p><strong>Type:</strong> ${sample.type}</p>`;
+            }
+
+            sampleHTML += `<p><strong>Grootte:</strong> ${sample.size} cl</p>`; // Altijd tonen (verplicht veld)
+            sampleHTML += `<p><strong>Waarde:</strong> ${sample.value}</p>`; // Altijd tonen (verplicht veld)
+
+            if (sample.cask && sample.cask.trim() !== "") {
+                sampleHTML += `<p><strong>Cask:</strong> ${sample.cask}</p>`;
+            }
+
+            if (sample.notes && sample.notes.trim() !== "") {
+                sampleHTML += `<p><strong>Opmerkingen:</strong> ${sample.notes}</p>`;
+            }
+
+            if (sample.whiskyBaseLink && sample.whiskyBaseLink.trim() !== "") {
+                sampleHTML += `<p><a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer">Whiskybase</a></p>`;
+            }
+
+            if (isOwner) {
+                sampleHTML += `<button onclick="deleteSample('${doc.id}')">Verwijderen</button>`;
+            }
 
             let sampleElement = document.createElement("div");
             sampleElement.classList.add("sample-card");
-            sampleElement.innerHTML = `
-                <h3>${sample.name} (${sample.age || "N/A"})</h3>
-                ${sample.type ? `<p><strong>Type:</strong> ${sample.type}</p>` : ""}
-                <p><strong>Grootte:</strong> ${sample.size} cl</p> <!-- Altijd tonen want het is verplicht -->
-<p><strong>Waarde:</strong> ${sample.value}</p>
-${sample.cask && sample.cask.trim() !== "" ? `<p><strong>Cask:</strong> ${sample.cask}</p>` : ""}
-${sample.notes && sample.notes.trim() !== "" ? `<p><strong>Opmerkingen:</strong> ${sample.notes}</p>` : ""}
-${sample.whiskyBaseLink && sample.whiskyBaseLink.trim() !== "" ? `<p><a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer">Whiskybase</a></p>` : ""}
-                ${isOwner ? `<button onclick="deleteSample('${doc.id}')">Verwijderen</button>` : ""}
-            `;
+            sampleElement.innerHTML = sampleHTML;
+
             document.getElementById("sampleList").appendChild(sampleElement);
         });
     });
