@@ -144,7 +144,7 @@ window.addSample = function () {
     return;
 }
 
-       let sampleData = {
+      let sampleData = {
     name: name.trim(),
     size: size.trim(), // Altijd opslaan, verplicht veld
     value: value.trim(), // Altijd opslaan, verplicht veld
@@ -152,7 +152,7 @@ window.addSample = function () {
     timestamp: firebase.firestore.FieldValue.serverTimestamp()
 };
 
-// Alleen opslaan als een veld daadwerkelijk is ingevuld (verwijder lege waarden)
+// Alleen opslaan als een veld daadwerkelijk is ingevuld
 if (age.trim() !== "") sampleData.age = age.trim();
 if (type.trim() !== "") sampleData.type = type.trim();
 if (whiskyBaseLink.trim() !== "") sampleData.whiskyBaseLink = whiskyBaseLink.trim();
@@ -160,8 +160,7 @@ if (cask.trim() !== "") sampleData.cask = cask.trim();
 if (notes.trim() !== "") sampleData.notes = notes.trim();
 
 window.db.collection("samples").add(sampleData)
-    
-.then(() => {
+    .then(() => {
         alert("✅ Sample toegevoegd!");
 
         // Velden resetten
@@ -182,7 +181,6 @@ window.db.collection("samples").add(sampleData)
     }).catch(error => {
         console.error("❌ Fout bij toevoegen: ", error);
     });
-};
 
 
 // 🔹 Samples Ophalen uit Database en Weergeven
@@ -196,18 +194,18 @@ window.loadSamples = function (user) {
 
             let sampleHTML = `<h3>${sample.name}${sample.age ? ` (${sample.age})` : ""}</h3>`;
 
-            if (sample.type) {
+            if (sample.type && sample.type !== "Onbekend") {
                 sampleHTML += `<p><strong>Type:</strong> ${sample.type}</p>`;
             }
 
             sampleHTML += `<p><strong>Grootte:</strong> ${sample.size} cl</p>`; // Altijd tonen (verplicht veld)
             sampleHTML += `<p><strong>Waarde:</strong> ${sample.value}</p>`; // Altijd tonen (verplicht veld)
 
-            if (sample.cask) {
+            if (sample.cask && sample.cask !== "Onbekend") {
                 sampleHTML += `<p><strong>Cask:</strong> ${sample.cask}</p>`;
             }
 
-            if (sample.notes) {
+            if (sample.notes && sample.notes !== "Geen opmerkingen") {
                 sampleHTML += `<p><strong>Opmerkingen:</strong> ${sample.notes}</p>`;
             }
 
