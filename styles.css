@@ -34,13 +34,16 @@ button:hover {
 }
 
 textarea {
-    width: 100%;
+    width: 100%; /* Breedte instellen op 100% van de container */
+    max-width: 400px; /* Zorgt ervoor dat het veld niet breder wordt dan andere invoervelden */
     padding: 10px;
     font-size: 16px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    resize: none; /* Voorkomt handmatige resize door de gebruiker */
-    overflow-y: hidden; /* Verbergt de scrollbar als deze niet nodig is */
-    min-height: 40px; /* Minimaal even hoog als een invoerveld */
+    resize: none; /* Handmatige resize door gebruiker uitzetten */
+    overflow-y: hidden; /* Scrollbar verbergen als deze niet nodig is */
+    min-height: 40px; /* Minimaal even hoog als een normaal invoerveld */
+    box-sizing: border-box; /* Zorgt ervoor dat padding en borders meetellen in de breedte */
 }
+
 
