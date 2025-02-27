@@ -144,20 +144,20 @@ window.addSample = function () {
     return;
 }
 
-   let sampleData = {
-    name: name,
+     let sampleData = {
+    name: name.trim(),
     size: size.trim(), // Altijd opslaan, verplicht veld
     value: value.trim(), // Altijd opslaan, verplicht veld
     userId: user.uid,
     timestamp: firebase.firestore.FieldValue.serverTimestamp()
 };
 
-// Alleen opslaan als een veld daadwerkelijk is ingevuld
-if (age.trim() !== "") sampleData.age = age;
-if (type.trim() !== "") sampleData.type = type;
-if (whiskyBaseLink.trim() !== "") sampleData.whiskyBaseLink = whiskyBaseLink;
-if (cask.trim() !== "") sampleData.cask = cask;
-if (notes.trim() !== "") sampleData.notes = notes;
+// Alleen opslaan als een veld daadwerkelijk is ingevuld (verwijder lege waarden)
+if (age.trim() !== "") sampleData.age = age.trim();
+if (type.trim() !== "") sampleData.type = type.trim();
+if (whiskyBaseLink.trim() !== "") sampleData.whiskyBaseLink = whiskyBaseLink.trim();
+if (cask.trim() !== "") sampleData.cask = cask.trim();
+if (notes.trim() !== "") sampleData.notes = notes.trim();
 
 window.db.collection("samples").add(sampleData)
     
@@ -203,11 +203,11 @@ window.loadSamples = function (user) {
             sampleHTML += `<p><strong>Grootte:</strong> ${sample.size} cl</p>`; // Altijd tonen (verplicht veld)
             sampleHTML += `<p><strong>Waarde:</strong> ${sample.value}</p>`; // Altijd tonen (verplicht veld)
 
-            if (sample.cask) {
+            if (sample.cask && sample.cask !== "Onbekend") {
                 sampleHTML += `<p><strong>Cask:</strong> ${sample.cask}</p>`;
             }
 
-            if (sample.notes) {
+            if (sample.notes && sample.notes !== "Geen opmerkingen") {
                 sampleHTML += `<p><strong>Opmerkingen:</strong> ${sample.notes}</p>`;
             }
 
