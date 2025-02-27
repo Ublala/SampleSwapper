@@ -104,8 +104,10 @@ window.resetPassword = function () {
 
 // 🔹 Controleer automatisch bij opstarten of gebruiker ingelogd is
 window.onload = () => {
-    checkUser();
-    loadSamples();
+    auth.onAuthStateChanged(user => {
+        checkUser();  // ✅ Controleer wie ingelogd is
+        loadSamples(); // ✅ Wacht op gebruiker voordat samples geladen worden
+    });
 };
 
 // 🔹 Sample Toevoegen aan Database
@@ -147,22 +149,23 @@ window.addSample = function () {
 
 // 🔹 Samples Ophalen uit Database en Weergeven
 window.loadSamples = function () {
-    let user = auth.currentUser;
-    document.getElementById("sampleList").innerHTML = ""; // Lijst leegmaken
+    auth.onAuthStateChanged(user => { // ✅ Wacht tot Firebase de gebruiker heeft geladen
+        document.getElementById("sampleList").innerHTML = ""; // Lijst leegmaken
 
-    window.db.collection("samples").orderBy("timestamp", "desc").get().then(snapshot => {
-        snapshot.forEach(doc => {
-            let sample = doc.data();
-            let isOwner = user && sample.userId === user.uid; // ✅ Check of gebruiker eigenaar is
+        window.db.collection("samples").orderBy("timestamp", "desc").get().then(snapshot => {
+            snapshot.forEach(doc => {
+                let sample = doc.data();
+                let isOwner = user && sample.userId === user.uid; // ✅ Check of gebruiker eigenaar is
 
-            document.getElementById("sampleList").innerHTML += `
-                <div class="sample-card">
-                    <h3>${sample.name} (${sample.age || "N/A"})</h3>
-                    <p><strong>Type:</strong> ${sample.type || "Onbekend"}</p>
-                    <p><strong>Waarde:</strong> ${sample.value}</p>
-                    ${isOwner ? `<button onclick="deleteSample('${doc.id}')">Verwijderen</button>` : ""}
-                </div>
-            `;
+                document.getElementById("sampleList").innerHTML += `
+                    <div class="sample-card">
+                        <h3>${sample.name} (${sample.age || "N/A"})</h3>
+                        <p><strong>Type:</strong> ${sample.type || "Onbekend"}</p>
+                        <p><strong>Waarde:</strong> ${sample.value}</p>
+                        ${isOwner ? `<button onclick="deleteSample('${doc.id}')">Verwijderen</button>` : ""}
+                    </div>
+                `;
+            });
         });
     });
 };
