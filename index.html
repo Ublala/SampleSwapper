@@ -33,7 +33,7 @@
     <input type="number" id="whiskySize" placeholder="Grootte van het sample (cl)">
     <input type="text" id="whiskyValue" placeholder="Waarde van het sample (bijv. €10)" required>
     <input type="url" id="whiskyBaseLink" placeholder="Link naar Whiskybase">
-    <textarea id="whiskyNotes" placeholder="Opmerkingen of beschrijving"></textarea>
+    <textarea id="whiskyNotes" placeholder="Opmerkingen of beschrijving" oninput="autoResize(this)"></textarea>
     <button onclick="addSample()">Voeg Sample Toe</button>
 </div>
 
