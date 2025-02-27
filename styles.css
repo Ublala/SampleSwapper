@@ -17,15 +17,16 @@ input {
 }
 
 button {
-    display: block;
-    width: auto; /* Past zich aan aan de tekstbreedte */
-    padding: 10px 20px; /* Zorgt voor mooie spacing */
+    display: inline-block; /* Zorgt ervoor dat de knop zo breed is als nodig */
+    width: auto; /* Past de breedte aan op basis van de tekst */
+    padding: 10px 20px; /* Houdt de knop compact maar leesbaar */
     background-color: #ff9900;
     border: none;
     color: white;
     cursor: pointer;
     text-align: center;
     border-radius: 5px;
+    font-size: 16px;
     margin: 10px auto; /* Centreert de knop */
 }
 
