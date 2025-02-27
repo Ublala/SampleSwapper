@@ -123,6 +123,7 @@ window.onload = () => {
 };
 
 // 🔹 Sample Toevoegen aan Database
+// 🔹 Sample Toevoegen aan Database
 window.addSample = function () {
     let user = auth.currentUser;
     if (!user) {
@@ -130,59 +131,74 @@ window.addSample = function () {
         return;
     }
 
-    let name = document.getElementById("whiskyName").value;
-    let age = document.getElementById("whiskyAge").value;
-    let type = document.getElementById("whiskyType").value;
-    let size = document.getElementById("whiskySize").value;
-    let value = document.getElementById("whiskyValue").value;
-    let whiskyBaseLink = document.getElementById("whiskyBaseLink").value;
-    let cask = document.getElementById("whiskyCask").value;
-    let notes = document.getElementById("whiskyNotes").value;
+    let name = document.getElementById("whiskyName").value.trim();
+    let age = document.getElementById("whiskyAge").value.trim();
+    let type = document.getElementById("whiskyType").value.trim();
+    let size = document.getElementById("whiskySize").value.trim();
+    let value = document.getElementById("whiskyValue").value.trim();
+    let whiskyBaseLink = document.getElementById("whiskyBaseLink").value.trim();
+    let cask = document.getElementById("whiskyCask").value.trim();
+    let notes = document.getElementById("whiskyNotes").value.trim();
 
-    if (name.trim() === "" || value.trim() === "" || size.trim() === "") {
-    alert("⚠️ Naam, prijs en sample grootte zijn verplicht!");
-    return;
-}
+    // ✅ Controleer of de verplichte velden zijn ingevuld
+    if (name === "" || value === "" || size === "") {
+        alert("⚠️ Naam, prijs en sample grootte zijn verplicht!");
+        return;
+    }
 
-      let sampleData = {
-    name: name.trim(),
-    size: size.trim(), // Altijd opslaan, verplicht veld
-    value: value.trim(), // Altijd opslaan, verplicht veld
-    userId: user.uid,
-    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    // ✅ Controleer of prijs een geldig getal is
+    if (!/^\d+(\.\d{1,2})?$/.test(value)) {
+        alert("⚠️ Voer een geldig bedrag in (alleen cijfers en optioneel een decimaal, bijvoorbeeld 12 of 12.50)");
+        return;
+    }
+
+    // ✅ Controleer of leeftijd een getal of 'NAS' is
+    if (age !== "" && !/^\d+$/.test(age) && age.toUpperCase() !== "NAS") {
+        alert("⚠️ Leeftijd moet een getal zijn of 'NAS'.");
+        return;
+    }
+
+    let sampleData = {
+        name: name,
+        size: size,  // Altijd opslaan
+        value: parseFloat(value),  // Opslaan als getal
+        userId: user.uid,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    // ✅ Alleen opslaan als het veld niet leeg is
+    if (age !== "") sampleData.age = age;
+    if (type !== "") sampleData.type = type;
+    if (whiskyBaseLink !== "") sampleData.whiskyBaseLink = whiskyBaseLink;
+    if (cask !== "") sampleData.cask = cask;
+    if (notes !== "") sampleData.notes = notes;
+
+    window.db.collection("samples").add(sampleData)
+        .then(() => {
+            alert("✅ Sample toegevoegd!");
+
+            // Velden resetten
+            document.getElementById("whiskyName").value = "";
+            document.getElementById("whiskyAge").value = "";
+            document.getElementById("whiskyType").value = "";
+            document.getElementById("whiskySize").value = "";
+            document.getElementById("whiskyValue").value = "";
+            document.getElementById("whiskyBaseLink").value = "";
+            document.getElementById("whiskyCask").value = "";
+            document.getElementById("whiskyNotes").value = "";
+
+            auth.onAuthStateChanged(updatedUser => {
+                if (updatedUser) {
+                    loadSamples(updatedUser);
+                }
+            });
+        }).catch(error => {
+            console.error("❌ Fout bij toevoegen: ", error);
+        });
 };
 
-// Alleen opslaan als een veld daadwerkelijk is ingevuld
-if (age.trim() !== "") sampleData.age = age.trim();
-if (type.trim() !== "") sampleData.type = type.trim();
-if (whiskyBaseLink.trim() !== "") sampleData.whiskyBaseLink = whiskyBaseLink.trim();
-if (cask.trim() !== "") sampleData.cask = cask.trim();
-if (notes.trim() !== "") sampleData.notes = notes.trim();
 
-window.db.collection("samples").add(sampleData)
-    .then(() => {
-        alert("✅ Sample toegevoegd!");
-
-        // Velden resetten
-        document.getElementById("whiskyName").value = "";
-        document.getElementById("whiskyAge").value = "";
-        document.getElementById("whiskyType").value = "";
-        document.getElementById("whiskySize").value = "";
-        document.getElementById("whiskyValue").value = "";
-        document.getElementById("whiskyBaseLink").value = "";
-        document.getElementById("whiskyCask").value = "";
-        document.getElementById("whiskyNotes").value = "";
-
-        auth.onAuthStateChanged(updatedUser => {
-            if (updatedUser) {
-                loadSamples(updatedUser);
-            }
-        });
-    }).catch(error => {
-        console.error("❌ Fout bij toevoegen: ", error);
-    });
-
-
+// 🔹 Samples Ophalen uit Database en Weergeven
 // 🔹 Samples Ophalen uit Database en Weergeven
 window.loadSamples = function (user) {
     document.getElementById("sampleList").innerHTML = "";
@@ -192,20 +208,25 @@ window.loadSamples = function (user) {
             let sample = doc.data();
             let isOwner = user && sample.userId === user.uid;
 
-            let sampleHTML = `<h3>${sample.name}${sample.age ? ` (${sample.age})` : ""}</h3>`;
+            let sampleHTML = `<h3>${sample.name}</h3>`;
 
-            if (sample.type && sample.type !== "Onbekend") {
+            // ✅ Leeftijd tonen (apart en met 'years' als het een getal is)
+            if (sample.age) {
+                sampleHTML += `<p><strong>Leeftijd:</strong> ${isNaN(sample.age) ? sample.age : sample.age + " years"}</p>`;
+            }
+
+            if (sample.type) {
                 sampleHTML += `<p><strong>Type:</strong> ${sample.type}</p>`;
             }
 
-            sampleHTML += `<p><strong>Grootte:</strong> ${sample.size} cl</p>`; // Altijd tonen (verplicht veld)
-            sampleHTML += `<p><strong>Waarde:</strong> ${sample.value}</p>`; // Altijd tonen (verplicht veld)
+            sampleHTML += `<p><strong>Grootte:</strong> ${sample.size} cl</p>`; // Altijd tonen
+            sampleHTML += `<p><strong>Waarde:</strong> €${sample.value.toFixed(2)}</p>`; // ✅ Euroteken toevoegen
 
-            if (sample.cask && sample.cask !== "Onbekend") {
+            if (sample.cask) {
                 sampleHTML += `<p><strong>Cask:</strong> ${sample.cask}</p>`;
             }
 
-            if (sample.notes && sample.notes !== "Geen opmerkingen") {
+            if (sample.notes) {
                 sampleHTML += `<p><strong>Opmerkingen:</strong> ${sample.notes}</p>`;
             }
 
