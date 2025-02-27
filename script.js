@@ -257,3 +257,4 @@ window.deleteSample = function (id) {
     });
 };
 
+console.log("Script is volledig geladen!");
