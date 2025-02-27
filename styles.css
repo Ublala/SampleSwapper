@@ -34,8 +34,9 @@ button:hover {
 }
 
 textarea {
-    width: 100%; /* Breedte instellen op 100% van de container */
-    max-width: 400px; /* Zorgt ervoor dat het veld niet breder wordt dan andere invoervelden */
+    display: block; /* Zorgt ervoor dat het net als de inputvelden werkt */
+    width: 80%; /* Zelfde breedte als de inputvelden */
+    max-width: 300px; /* Zelfde maximale breedte als de inputvelden */
     padding: 10px;
     font-size: 16px;
     border: 1px solid #ccc;
@@ -43,7 +44,8 @@ textarea {
     resize: none; /* Handmatige resize door gebruiker uitzetten */
     overflow-y: hidden; /* Scrollbar verbergen als deze niet nodig is */
     min-height: 40px; /* Minimaal even hoog als een normaal invoerveld */
-    box-sizing: border-box; /* Zorgt ervoor dat padding en borders meetellen in de breedte */
+    box-sizing: border-box; /* Voorkomt dat padding/borders de breedte vergroten */
+    margin: 10px auto; /* Zelfde marges als inputvelden */
 }
 
 
