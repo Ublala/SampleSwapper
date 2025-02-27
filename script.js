@@ -218,7 +218,7 @@ window.loadSamples = function (user) {
 
             sampleHTML += `<p><strong>Grootte:</strong> ${sample.size} cl</p>`; // Altijd tonen
            let value = parseFloat(sample.value);
-sampleHTML += `<p><strong>Waarde:</strong> € ${!isNaN(value) ? value.toFixed(2) : sample.value}</p>`;
+sampleHTML += `<p><strong>Waarde:</strong> €&nbsp;${!isNaN(value) ? value.toFixed(2) : sample.value}</p>`;
             
             if (sample.cask) {
                 sampleHTML += `<p><strong>Cask:</strong> ${sample.cask}</p>`;
