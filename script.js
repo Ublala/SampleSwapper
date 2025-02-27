@@ -209,9 +209,9 @@ window.loadSamples = function (user) {
 
             // ✅ Leeftijd tonen (apart en met 'years' als het een getal is)
             if (sample.age) {
-                sampleHTML += `<p><strong>Leeftijd:</strong> ${isNaN(sample.age) ? sample.age : sample.age + " years"}</p>`;
-            }
-
+    let formattedAge = sample.age.toUpperCase() === "NAS" ? "NAS" : `${sample.age} years`;
+    sampleHTML += `<p><strong>Leeftijd:</strong> ${formattedAge}</p>`;
+}
             if (sample.type) {
                 sampleHTML += `<p><strong>Type:</strong> ${sample.type}</p>`;
             }
