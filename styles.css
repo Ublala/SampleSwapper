@@ -10,6 +10,10 @@ input {
     padding: 10px;
     width: 80%;
     max-width: 300px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
 }
 
 button {
@@ -39,20 +43,22 @@ button:hover {
 }
 
 textarea {
-    display: block; /* Zorgt ervoor dat het zich net als een input-veld gedraagt */
-    width: 100%; /* Zelfde breedte als inputvelden */
-    max-width: 300px; /* Zelfde maximale breedte als inputvelden */
+    display: block;
+    width: 80%; /* Zelfde breedte als inputvelden */
+    max-width: 300px; /* Houdt de breedte gelijk aan de inputvelden */
     padding: 10px;
     font-size: 16px;
     border: 1px solid #ccc; /* Zelfde kleur als inputvelden */
     border-radius: 5px;
     resize: none; /* Handmatige resize door gebruiker uitzetten */
     overflow-y: hidden; /* Scrollbar verbergen als deze niet nodig is */
-    min-height: 40px; /* Minimaal even hoog als een normaal invoerveld */
+    min-height: 50px; /* Standaard hoogte iets groter, gelijk aan inputvelden */
+    line-height: 1.5; /* Houdt de tekst goed uitgelijnd in het veld */
     box-sizing: border-box;
     margin: 10px auto; /* Centreer het veld net als de andere inputvelden */
-    background-color: white; /* Zorgt ervoor dat de achtergrond gelijk blijft */
+    background-color: white; /* Voorkomt kleurverschil */
 }
+
 
 
 
