@@ -136,8 +136,8 @@ window.addSample = function () {
 
     window.db.collection("samples").add({
         name: name,
-        age: age || "N/A", // Niet verplicht
-        type: type || "Onbekend", // Niet verplicht
+        age: age || "N/A",
+        type: type || "Onbekend",
         value: value,
         userId: user.uid, // ✅ Sla de gebruiker-ID op
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -147,7 +147,8 @@ window.addSample = function () {
         document.getElementById("whiskyAge").value = "";
         document.getElementById("whiskyType").value = "";
         document.getElementById("whiskyValue").value = ""; // ✅ Velden resetten na toevoegen
-        loadSamples();
+
+        loadSamples(user); // ✅ Direct opnieuw laden met de huidige gebruiker
     }).catch(error => {
         console.error("❌ Fout bij toevoegen: ", error);
     });
@@ -155,8 +156,7 @@ window.addSample = function () {
 
 // 🔹 Samples Ophalen uit Database en Weergeven
 window.loadSamples = function (user) {
-    let sampleList = document.getElementById("sampleList");
-    sampleList.innerHTML = ""; // ✅ Leeg de lijst voordat we samples toevoegen
+    document.getElementById("sampleList").innerHTML = ""; // ✅ Leeg de lijst voordat we samples toevoegen
 
     window.db.collection("samples").orderBy("timestamp", "desc").get().then(snapshot => {
         snapshot.forEach(doc => {
@@ -174,7 +174,7 @@ window.loadSamples = function (user) {
                 <p><strong>Waarde:</strong> ${sample.value}</p>
                 ${isOwner ? `<button onclick="deleteSample('${doc.id}')">Verwijderen</button>` : ""}
             `;
-            sampleList.appendChild(sampleElement); // ✅ Voeg het sample toe aan de lijst
+            document.getElementById("sampleList").appendChild(sampleElement);
         });
     });
 };
