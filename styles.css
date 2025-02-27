@@ -13,11 +13,16 @@ input {
 }
 
 button {
+    display: block; /* Zorgt ervoor dat de knop op een nieuwe regel komt */
+    width: 80%; /* Zelfde breedte als invoervelden */
+    max-width: 300px; /* Zelfde breedte als input en textarea */
+    margin: 10px auto; /* Centreer de knop */
     padding: 10px 15px;
     background-color: #ff9900;
     border: none;
     color: white;
     cursor: pointer;
+    text-align: center;
 }
 
 button:hover {
@@ -34,18 +39,20 @@ button:hover {
 }
 
 textarea {
-    display: block; /* Zorgt ervoor dat het net als de inputvelden werkt */
-    width: 80%; /* Zelfde breedte als de inputvelden */
-    max-width: 300px; /* Zelfde maximale breedte als de inputvelden */
+    display: block; /* Zorgt ervoor dat het zich net als een input-veld gedraagt */
+    width: 80%; /* Zelfde breedte als inputvelden */
+    max-width: 300px; /* Zelfde maximale breedte als inputvelden */
     padding: 10px;
     font-size: 16px;
-    border: 1px solid #ccc;
+    border: 1px solid #ccc; /* Zelfde kleur als inputvelden */
     border-radius: 5px;
     resize: none; /* Handmatige resize door gebruiker uitzetten */
     overflow-y: hidden; /* Scrollbar verbergen als deze niet nodig is */
     min-height: 40px; /* Minimaal even hoog als een normaal invoerveld */
-    box-sizing: border-box; /* Voorkomt dat padding/borders de breedte vergroten */
-    margin: 10px auto; /* Zelfde marges als inputvelden */
+    box-sizing: border-box;
+    margin: 10px auto; /* Centreer het veld net als de andere inputvelden */
+    background-color: white; /* Zorgt ervoor dat de achtergrond gelijk blijft */
 }
+
 
 
