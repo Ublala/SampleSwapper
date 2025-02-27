@@ -139,10 +139,11 @@ window.addSample = function () {
     let cask = document.getElementById("whiskyCask").value;
     let notes = document.getElementById("whiskyNotes").value;
 
-    if (name === "" || value === "") {
-        alert("⚠️ Naam en prijs zijn verplicht!");
-        return;
-    }
+    if (name.trim() === "" || value.trim() === "" || size.trim() === "") {
+    alert("⚠️ Naam, prijs en sample grootte zijn verplicht!");
+    return;
+}
+
 
     window.db.collection("samples").add({
         name: name,
