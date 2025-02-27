@@ -17,16 +17,16 @@ input {
 }
 
 button {
-    display: block; /* Zorgt ervoor dat de knop op een nieuwe regel komt */
-    width: 80%; /* Zelfde breedte als invoervelden */
-    max-width: 300px; /* Zelfde breedte als input en textarea */
-    margin: 10px auto; /* Centreer de knop */
-    padding: 10px 15px;
+    display: block;
+    width: auto; /* Past zich aan aan de tekstbreedte */
+    padding: 10px 20px; /* Zorgt voor mooie spacing */
     background-color: #ff9900;
     border: none;
     color: white;
     cursor: pointer;
     text-align: center;
+    border-radius: 5px;
+    margin: 10px auto; /* Centreert de knop */
 }
 
 button:hover {
@@ -48,16 +48,17 @@ textarea {
     max-width: 300px; /* Houdt de breedte gelijk aan de inputvelden */
     padding: 10px;
     font-size: 16px;
-    border: 1px solid #ccc; /* Zelfde kleur als inputvelden */
+    border: 1px solid #ccc; /* Zelfde rand als invoervelden */
     border-radius: 5px;
-    resize: none; /* Handmatige resize door gebruiker uitzetten */
-    overflow-y: hidden; /* Scrollbar verbergen als deze niet nodig is */
-    min-height: 50px; /* Standaard hoogte iets groter, gelijk aan inputvelden */
-    line-height: 1.5; /* Houdt de tekst goed uitgelijnd in het veld */
+    resize: none; /* Voorkomt handmatige vergroting */
+    overflow-y: hidden; /* Scrollbar alleen als nodig */
+    min-height: 40px; /* Zelfde hoogte als inputvelden */
+    line-height: 1.5; /* Beter uitgelijnde tekst */
     box-sizing: border-box;
-    margin: 10px auto; /* Centreer het veld net als de andere inputvelden */
-    background-color: white; /* Voorkomt kleurverschil */
+    margin: 10px auto; /* Centreer net als inputvelden */
+    background-color: white;
 }
+
 
 
 
