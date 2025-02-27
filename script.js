@@ -144,7 +144,7 @@ window.addSample = function () {
     return;
 }
 
-     let sampleData = {
+       let sampleData = {
     name: name.trim(),
     size: size.trim(), // Altijd opslaan, verplicht veld
     value: value.trim(), // Altijd opslaan, verplicht veld
@@ -194,7 +194,7 @@ window.loadSamples = function (user) {
             let sample = doc.data();
             let isOwner = user && sample.userId === user.uid;
 
-            let sampleHTML = `<h3>${sample.name} ${sample.age ? `(${sample.age})` : ""}</h3>`;
+            let sampleHTML = `<h3>${sample.name}${sample.age ? ` (${sample.age})` : ""}</h3>`;
 
             if (sample.type) {
                 sampleHTML += `<p><strong>Type:</strong> ${sample.type}</p>`;
@@ -203,11 +203,11 @@ window.loadSamples = function (user) {
             sampleHTML += `<p><strong>Grootte:</strong> ${sample.size} cl</p>`; // Altijd tonen (verplicht veld)
             sampleHTML += `<p><strong>Waarde:</strong> ${sample.value}</p>`; // Altijd tonen (verplicht veld)
 
-            if (sample.cask && sample.cask !== "Onbekend") {
+            if (sample.cask) {
                 sampleHTML += `<p><strong>Cask:</strong> ${sample.cask}</p>`;
             }
 
-            if (sample.notes && sample.notes !== "Geen opmerkingen") {
+            if (sample.notes) {
                 sampleHTML += `<p><strong>Opmerkingen:</strong> ${sample.notes}</p>`;
             }
 
