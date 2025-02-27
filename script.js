@@ -195,12 +195,12 @@ window.loadSamples = function (user) {
             sampleElement.classList.add("sample-card");
             sampleElement.innerHTML = `
                 <h3>${sample.name} (${sample.age || "N/A"})</h3>
-                <p><strong>Type:</strong> ${sample.type || "Onbekend"}</p>
-                <p><strong>Grootte:</strong> ${sample.size || "Onbekend"} cl</p>
-                <p><strong>Waarde:</strong> ${sample.value}</p>
-                <p><strong>Cask:</strong> ${sample.cask || "Onbekend"}</p>
-                <p><strong>Opmerkingen:</strong> ${sample.notes || "Geen opmerkingen"}</p>
-                <p>${sample.whiskyBaseLink ? `<a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer">Whiskybase</a>` : "Geen link beschikbaar"}</p>
+                ${sample.type ? `<p><strong>Type:</strong> ${sample.type}</p>` : ""}
+<p><strong>Grootte:</strong> ${sample.size} cl</p> <!-- Altijd tonen want het is verplicht -->
+<p><strong>Waarde:</strong> ${sample.value}</p>
+${sample.cask ? `<p><strong>Cask:</strong> ${sample.cask}</p>` : ""}
+${sample.notes ? `<p><strong>Opmerkingen:</strong> ${sample.notes}</p>` : ""}
+${sample.whiskyBaseLink ? `<p><a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer">Whiskybase</a></p>` : ""}
                 ${isOwner ? `<button onclick="deleteSample('${doc.id}')">Verwijderen</button>` : ""}
             `;
             document.getElementById("sampleList").appendChild(sampleElement);
