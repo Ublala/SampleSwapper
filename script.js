@@ -146,17 +146,17 @@ window.addSample = function () {
 
 
     window.db.collection("samples").add({
-        name: name,
-        age: age || "N/A",
-        type: type || "Onbekend",
-        size: size || "Onbekend",
-        value: value,
-        whiskyBaseLink: whiskyBaseLink || null,
-        cask: cask || "Onbekend",
-        notes: notes || "Geen opmerkingen",
-        userId: user.uid,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
+    name: name,
+    age: age.trim() !== "" ? age : null,
+    type: type.trim() !== "" ? type : null,
+    size: size.trim(),
+    value: value.trim(),
+    whiskyBaseLink: whiskyBaseLink.trim() !== "" ? whiskyBaseLink : null,
+    cask: cask.trim() !== "" ? cask : null,
+    notes: notes.trim() !== "" ? notes : null,
+    userId: user.uid,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+}).then(() => {
         alert("✅ Sample toegevoegd!");
 
         // Velden resetten
@@ -196,11 +196,11 @@ window.loadSamples = function (user) {
             sampleElement.innerHTML = `
                 <h3>${sample.name} (${sample.age || "N/A"})</h3>
                 ${sample.type ? `<p><strong>Type:</strong> ${sample.type}</p>` : ""}
-<p><strong>Grootte:</strong> ${sample.size} cl</p> <!-- Altijd tonen want het is verplicht -->
+                <p><strong>Grootte:</strong> ${sample.size} cl</p> <!-- Altijd tonen want het is verplicht -->
 <p><strong>Waarde:</strong> ${sample.value}</p>
-${sample.cask ? `<p><strong>Cask:</strong> ${sample.cask}</p>` : ""}
-${sample.notes ? `<p><strong>Opmerkingen:</strong> ${sample.notes}</p>` : ""}
-${sample.whiskyBaseLink ? `<p><a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer">Whiskybase</a></p>` : ""}
+${sample.cask && sample.cask.trim() !== "" ? `<p><strong>Cask:</strong> ${sample.cask}</p>` : ""}
+${sample.notes && sample.notes.trim() !== "" ? `<p><strong>Opmerkingen:</strong> ${sample.notes}</p>` : ""}
+${sample.whiskyBaseLink && sample.whiskyBaseLink.trim() !== "" ? `<p><a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer">Whiskybase</a></p>` : ""}
                 ${isOwner ? `<button onclick="deleteSample('${doc.id}')">Verwijderen</button>` : ""}
             `;
             document.getElementById("sampleList").appendChild(sampleElement);
