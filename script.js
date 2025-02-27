@@ -220,7 +220,7 @@ window.loadSamples = function (user) {
             }
 
             sampleHTML += `<p><strong>Grootte:</strong> ${sample.size} cl</p>`; // Altijd tonen
-            sampleHTML += `<p><strong>Waarde:</strong> €${sample.value.toFixed(2)}</p>`; // ✅ Euroteken toevoegen
+           sampleHTML += `<p><strong>Waarde:</strong> €${parseFloat(sample.value).toFixed(2)}</p>`;
 
             if (sample.cask) {
                 sampleHTML += `<p><strong>Cask:</strong> ${sample.cask}</p>`;
