@@ -143,12 +143,20 @@ window.addSample = function () {
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
     }).then(() => {
         alert("✅ Sample toegevoegd!");
+
+        // ✅ Velden resetten na toevoegen
         document.getElementById("whiskyName").value = "";
         document.getElementById("whiskyAge").value = "";
         document.getElementById("whiskyType").value = "";
-        document.getElementById("whiskyValue").value = ""; // ✅ Velden resetten na toevoegen
+        document.getElementById("whiskyValue").value = ""; 
 
-        loadSamples(user); // ✅ Direct opnieuw laden met de huidige gebruiker
+        // ✅ Wacht even en laad samples opnieuw MET de juiste gebruiker
+        auth.onAuthStateChanged(updatedUser => {
+            if (updatedUser) {
+                console.log("🔄 Gebruiker opnieuw opgehaald:", updatedUser.uid);
+                loadSamples(updatedUser);
+            }
+        });
     }).catch(error => {
         console.error("❌ Fout bij toevoegen: ", error);
     });
