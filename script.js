@@ -199,7 +199,7 @@ window.loadSamples = function (user) {
                 <p><strong>Waarde:</strong> ${sample.value}</p>
                 <p><strong>Cask:</strong> ${sample.cask || "Onbekend"}</p>
                 <p><strong>Opmerkingen:</strong> ${sample.notes || "Geen opmerkingen"}</p>
-                <p>${whiskyBaseHTML}</p>
+                <p>${sample.whiskyBaseLink ? `<a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer">Whiskybase</a>` : "Geen link beschikbaar"}</p>
                 ${isOwner ? `<button onclick="deleteSample('${doc.id}')">Verwijderen</button>` : ""}
             `;
             document.getElementById("sampleList").appendChild(sampleElement);
