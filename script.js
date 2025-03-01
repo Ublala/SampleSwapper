@@ -65,7 +65,8 @@ window.onload = () => {
 
 // 🔹 Samples ophalen en weergeven
 window.loadSamples = function (user) {
-    document.getElementById("sampleList").innerHTML = ""; // ✅ Voorkomt verdubbeling van kaarten
+    let sampleList = document.getElementById("sampleList");
+    sampleList.innerHTML = ""; // ✅ Voorkomt verdubbeling van kaarten
 
     window.db.collection("samples").orderBy("timestamp", "desc").get().then(snapshot => {
         snapshot.forEach(doc => {
@@ -74,7 +75,7 @@ window.loadSamples = function (user) {
 
             let sampleHTML = `<div id="sample-${doc.id}" class="sample-card">`;
             sampleHTML += `<h3><strong>Whisky:</strong> <span class="sample-name">${sample.name}</span></h3>`;
-            sampleHTML += `<p><strong>Leeftijd:</strong> <span class="sample-age">${sample.age ? (sample.age === "NAS" ? "NAS" : `${sample.age.replace(/ years/g, '')} years`) : ""}</span></p>`;
+            sampleHTML += `<p><strong>Leeftijd:</strong> <span class="sample-age">${sample.age ? sample.age.replace(/ years/g, '') + " years" : ""}</span></p>`;
             sampleHTML += `<p><strong>Type:</strong> <span class="sample-type">${sample.type || ""}</span></p>`;
             sampleHTML += `<p><strong>Grootte:</strong> <span class="sample-size">${sample.size}</span> cl</p>`;
             sampleHTML += `<p><strong>Waarde:</strong> €&nbsp;<span class="sample-value">${parseFloat(sample.value).toFixed(2)}</span></p>`;
@@ -94,7 +95,7 @@ window.loadSamples = function (user) {
             }
 
             sampleHTML += `</div>`;
-            document.getElementById("sampleList").innerHTML += sampleHTML;
+            sampleList.innerHTML += sampleHTML;
         });
     }).catch(error => {
         console.error("❌ Fout bij laden van samples:", error);
@@ -142,7 +143,7 @@ window.autoResize = function (element) {
 window.deleteSample = function (id) {
     db.collection("samples").doc(id).delete().then(() => {
         alert("✅ Sample verwijderd!");
-        window.location.reload(); // ✅ Voorkomt dat knoppen verdwijnen
+        loadSamples(); // ✅ Voorkomt dat knoppen verdwijnen
     }).catch(error => {
         console.error("❌ Fout bij verwijderen: ", error);
     });
