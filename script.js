@@ -52,7 +52,7 @@ window.login = function () {
 window.logout = function () {
     auth.signOut().then(() => {
         alert("✅ Uitgelogd!");
-        checkUser();
+        window.location.reload(); // ✅ Voorkomt verdubbeling van samplecards
     }).catch(error => {
         console.error("❌ Fout bij uitloggen:", error);
     });
@@ -81,9 +81,9 @@ window.loadSamples = function (user) {
             sampleHTML += `<p><strong>Cask:</strong> <span class="sample-cask">${sample.cask || ""}</span></p>`;
             sampleHTML += `<p><strong>Opmerkingen:</strong> <span class="sample-notes">${sample.notes || ""}</span></p>`;
 
-            // ✅ Correcte weergave van de Whiskybase-link
+            // ✅ Correcte weergave van de Whiskybase-link ZONDER AANHEF
             if (sample.whiskyBaseLink) {
-                sampleHTML += `<p><strong>Whiskybase:</strong> <a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer">Whiskybase</a></p>`;
+                sampleHTML += `<p><a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer">Whiskybase</a></p>`;
             }
 
             if (isOwner) {
@@ -142,7 +142,7 @@ window.autoResize = function (element) {
 window.deleteSample = function (id) {
     db.collection("samples").doc(id).delete().then(() => {
         alert("✅ Sample verwijderd!");
-        loadSamples();
+        window.location.reload(); // ✅ Voorkomt dat knoppen verdwijnen
     }).catch(error => {
         console.error("❌ Fout bij verwijderen: ", error);
     });
