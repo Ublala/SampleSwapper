@@ -266,26 +266,27 @@ window.enableEditMode = function (docId) {
     let sampleElement = document.getElementById(`sample-${docId}`);
     let editButton = document.getElementById(`edit-btn-${docId}`);
 
-    let nameField = sampleElement.querySelector(".sample-name");
-    let ageField = sampleElement.querySelector(".sample-age");
-    let typeField = sampleElement.querySelector(".sample-type");
-    let sizeField = sampleElement.querySelector(".sample-size");
-    let valueField = sampleElement.querySelector(".sample-value");
-    let caskField = sampleElement.querySelector(".sample-cask");
-    let notesField = sampleElement.querySelector(".sample-notes");
-    let whiskyBaseField = sampleElement.querySelector(".sample-whiskybase");
+    let fields = [
+        { class: "sample-name", type: "text" },
+        { class: "sample-age", type: "text" },
+        { class: "sample-type", type: "text" },
+        { class: "sample-size", type: "number" },
+        { class: "sample-value", type: "number", step: "0.01" },
+        { class: "sample-cask", type: "text" },
+        { class: "sample-notes", type: "text" },
+        { class: "sample-whiskybase", type: "text" }
+    ];
 
-    // Zet tekst om naar invoervelden
-    nameField.innerHTML = `<input type="text" value="${nameField.innerText}" class="edit-input">`;
-    ageField.innerHTML = `<input type="text" value="${ageField.innerText.replace(' years', '')}" class="edit-input">`;
-    typeField.innerHTML = `<input type="text" value="${typeField.innerText}" class="edit-input">`;
-    sizeField.innerHTML = `<input type="number" value="${sizeField.innerText.replace(' cl', '')}" class="edit-input">`;
-    valueField.innerHTML = `<input type="number" step="0.01" value="${valueField.innerText.replace('€', '').trim()}" class="edit-input">`;
-    caskField.innerHTML = `<input type="text" value="${caskField.innerText}" class="edit-input">`;
-    notesField.innerHTML = `<input type="text" value="${notesField.innerText}" class="edit-input">`;
-    whiskyBaseField.innerHTML = `<input type="text" value="${whiskyBaseField.innerText}" class="edit-input">`;
+    fields.forEach(field => {
+        let element = sampleElement.querySelector(`.${field.class}`);
+        if (element) {
+            let value = element.innerText.replace(" cl", "").replace("€", "").trim();
+            let stepAttr = field.step ? `step="${field.step}"` : ""; 
+            element.innerHTML = `<input type="${field.type}" value="${value}" class="edit-input" ${stepAttr}>`;
+        }
+    });
 
-    // Verander bewerkknop naar opslaanknop
+    // Verander bewerkknop in opslaanknop
     editButton.innerText = "Opslaan";
     editButton.setAttribute("onclick", `saveSample('${docId}')`);
 };
@@ -295,33 +296,32 @@ window.saveSample = function (docId) {
     let sampleElement = document.getElementById(`sample-${docId}`);
     let editButton = document.getElementById(`edit-btn-${docId}`);
 
-    let name = sampleElement.querySelector(".sample-name input").value.trim();
-    let age = sampleElement.querySelector(".sample-age input").value.trim();
-    let type = sampleElement.querySelector(".sample-type input").value.trim();
-    let size = sampleElement.querySelector(".sample-size input").value.trim();
-    let value = sampleElement.querySelector(".sample-value input").value.trim();
-    let cask = sampleElement.querySelector(".sample-cask input").value.trim();
-    let notes = sampleElement.querySelector(".sample-notes input").value.trim();
-    let whiskyBaseLink = sampleElement.querySelector(".sample-whiskybase input").value.trim();
+    let updatedData = {};
 
-    // Controleer invoer
-    if (name === "" || size === "" || value === "") {
+    let fields = [
+        { class: "sample-name", key: "name" },
+        { class: "sample-age", key: "age" },
+        { class: "sample-type", key: "type" },
+        { class: "sample-size", key: "size" },
+        { class: "sample-value", key: "value" },
+        { class: "sample-cask", key: "cask" },
+        { class: "sample-notes", key: "notes" },
+        { class: "sample-whiskybase", key: "whiskyBaseLink" }
+    ];
+
+    fields.forEach(field => {
+        let inputElement = sampleElement.querySelector(`.${field.class} input`);
+        if (inputElement) {
+            let value = inputElement.value.trim();
+            if (field.key === "value") value = parseFloat(value);
+            if (value) updatedData[field.key] = value;
+        }
+    });
+
+    if (!updatedData.name || !updatedData.size || !updatedData.value) {
         alert("⚠️ Naam, grootte en waarde zijn verplicht!");
         return;
     }
-
-    let updatedData = {
-        name,
-        size,
-        value: parseFloat(value),
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    };
-
-    if (age) updatedData.age = age.match(/^\d+$/) ? `${age} years` : age;
-    if (type) updatedData.type = type;
-    if (cask) updatedData.cask = cask;
-    if (notes) updatedData.notes = notes;
-    if (whiskyBaseLink) updatedData.whiskyBaseLink = whiskyBaseLink;
 
     // Update Firestore
     db.collection("samples").doc(docId).update(updatedData)
@@ -334,7 +334,7 @@ window.saveSample = function (docId) {
             alert("❌ Er ging iets mis bij het opslaan.");
         });
 
-    // Verander opslaanknop terug naar bewerkknop
+    // Zet opslaanknop terug naar bewerkknop
     editButton.innerText = "Bewerken";
     editButton.setAttribute("onclick", `enableEditMode('${docId}')`);
 };
