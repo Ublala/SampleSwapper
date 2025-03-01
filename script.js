@@ -17,6 +17,19 @@ window.db = firebase.firestore();
 console.log("✅ Firebase is geladen:", firebase);
 console.log("✅ Firestore Database:", db);
 
+// 🔹 Controleer of een gebruiker is ingelogd en pas UI aan
+window.checkUser = function () {
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            document.getElementById("userStatus").innerText = `✅ Ingelogd als: ${user.email}`;
+            loadSamples(user);
+        } else {
+            document.getElementById("userStatus").innerText = "❌ Niet ingelogd";
+            loadSamples(null);
+        }
+    });
+};
+
 // 🔹 Inloggen functionaliteit
 window.login = function () {
     let email = document.getElementById("email").value;
@@ -33,12 +46,9 @@ window.login = function () {
         });
 };
 
-// 🔹 Automatisch controleren of gebruiker ingelogd is
+// 🔹 Automatisch controleren of gebruiker ingelogd is bij opstarten
 window.onload = () => {
-    auth.onAuthStateChanged(user => {
-        checkUser();
-        loadSamples(user);
-    });
+    checkUser();
 };
 
 // 🔹 Samples ophalen en weergeven
@@ -59,7 +69,6 @@ window.loadSamples = function (user) {
             sampleHTML += sample.cask ? `<p><strong>Cask:</strong> <span class="sample-cask">${sample.cask}</span></p>` : "";
             sampleHTML += sample.notes ? `<p><strong>Opmerkingen:</strong> <span class="sample-notes">${sample.notes}</span></p>` : "";
             
-            // ✅ Corrigeer de Whiskybase-linkweergave
             if (sample.whiskyBaseLink) {
                 sampleHTML += `<p><strong>Whiskybase:</strong> <a class="sample-whiskybase" href="${sample.whiskyBaseLink}" target="_blank">Whiskybase</a></p>`;
             }
@@ -94,35 +103,11 @@ window.enableEditMode = function (docId) {
                 value = linkElement ? linkElement.getAttribute("href") : "";
             }
             fieldElement.innerHTML = `<input type="text" value="${value}" class="edit-input">`;
-
-            if (field === "notes") {
-                let textarea = document.createElement("textarea");
-                textarea.classList.add("edit-input");
-                textarea.value = value;
-                textarea.oninput = function () { autoResize(this); };
-                fieldElement.innerHTML = "";
-                fieldElement.appendChild(textarea);
-                autoResize(textarea);
-            }
         }
     });
 
-    // ✅ Zorg dat bewerkingsvelden op één regel staan
-    let inputs = sampleElement.querySelectorAll(".edit-input");
-    inputs.forEach(input => {
-        input.style.display = "inline-block";
-        input.style.marginRight = "10px";
-    });
-
-    // Vervang bewerkknop door opslaanknop + annuleerknop
     editButton.innerText = "Opslaan";
     editButton.setAttribute("onclick", `saveSample('${docId}')`);
-
-    let cancelButton = document.createElement("button");
-    cancelButton.innerText = "Annuleren";
-    cancelButton.setAttribute("onclick", `cancelEdit('${docId}')`);
-    cancelButton.id = `cancel-btn-${docId}`;
-    sampleElement.appendChild(cancelButton);
 };
 
 // 🔹 Wijzigingen opslaan
@@ -137,12 +122,10 @@ window.saveSample = function (docId) {
 
     let optionalFields = ["age", "type", "cask", "notes", "whiskyBase"];
     optionalFields.forEach(field => {
-        let inputElement = sampleElement.querySelector(`.sample-${field} input, .sample-${field} textarea`);
+        let inputElement = sampleElement.querySelector(`.sample-${field} input`);
         if (inputElement) {
             let value = inputElement.value.trim();
-            if (value) {
-                updatedData[field] = value;
-            }
+            if (value) updatedData[field] = value;
         }
     });
 
@@ -153,7 +136,6 @@ window.saveSample = function (docId) {
         })
         .catch(error => {
             console.error("❌ Fout bij bijwerken:", error);
-            alert("❌ Er ging iets mis bij het opslaan.");
         });
 };
 
