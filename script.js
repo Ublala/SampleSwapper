@@ -22,9 +22,11 @@ window.checkUser = function () {
     auth.onAuthStateChanged(user => {
         if (user) {
             document.getElementById("userStatus").innerText = `✅ Ingelogd als: ${user.email}`;
+            document.getElementById("logoutButton").style.display = "block";
             loadSamples(user);
         } else {
             document.getElementById("userStatus").innerText = "❌ Niet ingelogd";
+            document.getElementById("logoutButton").style.display = "none";
             loadSamples(null);
         }
     });
@@ -46,22 +48,19 @@ window.login = function () {
         });
 };
 
-// 🔹 Controleer of een gebruiker is ingelogd en pas UI aan
-window.checkUser = function () {
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            document.getElementById("userStatus").innerText = `✅ Ingelogd als: ${user.email}`;
-            loadSamples(user);
-        } else {
-            document.getElementById("userStatus").innerText = "❌ Niet ingelogd";
-            loadSamples(null);
-        }
+// 🔹 Uitloggen functionaliteit
+window.logout = function () {
+    auth.signOut().then(() => {
+        alert("✅ Uitgelogd!");
+        checkUser();
+    }).catch(error => {
+        console.error("❌ Fout bij uitloggen:", error);
     });
 };
 
 // 🔹 Automatisch controleren of gebruiker ingelogd is bij opstarten
 window.onload = () => {
-    checkUser(); // Roep de functie aan zodat de UI direct wordt aangepast
+    checkUser(); 
 };
 
 // 🔹 Samples ophalen en weergeven
@@ -81,9 +80,10 @@ window.loadSamples = function (user) {
             sampleHTML += `<p><strong>Waarde:</strong> €&nbsp;<span class="sample-value">${parseFloat(sample.value).toFixed(2)}</span></p>`;
             sampleHTML += sample.cask ? `<p><strong>Cask:</strong> <span class="sample-cask">${sample.cask}</span></p>` : "";
             sampleHTML += sample.notes ? `<p><strong>Opmerkingen:</strong> <span class="sample-notes">${sample.notes}</span></p>` : "";
-            
+
+            // ✅ Correcte weergave van de Whiskybase-link
             if (sample.whiskyBaseLink) {
-                sampleHTML += `<p><strong>Whiskybase:</strong> <a class="sample-whiskybase" href="${sample.whiskyBaseLink}" target="_blank">Whiskybase</a></p>`;
+                sampleHTML += `<p><strong>Whiskybase:</strong> <a class="sample-whiskybase" href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer">Whiskybase</a></p>`;
             }
 
             if (isOwner) {
@@ -116,6 +116,9 @@ window.enableEditMode = function (docId) {
                 value = linkElement ? linkElement.getAttribute("href") : "";
             }
             fieldElement.innerHTML = `<input type="text" value="${value}" class="edit-input">`;
+        } else {
+            // ✅ Toon lege velden zodat ze alsnog ingevuld kunnen worden
+            sampleElement.innerHTML += `<p><strong>${field}:</strong> <input type="text" class="edit-input"></p>`;
         }
     });
 
