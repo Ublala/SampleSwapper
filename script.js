@@ -65,7 +65,7 @@ window.onload = () => {
 
 // 🔹 Samples ophalen en weergeven
 window.loadSamples = function (user) {
-    document.getElementById("sampleList").innerHTML = "";
+    document.getElementById("sampleList").innerHTML = ""; // ✅ Voorkomt verdubbeling van kaarten
 
     window.db.collection("samples").orderBy("timestamp", "desc").get().then(snapshot => {
         snapshot.forEach(doc => {
@@ -74,7 +74,7 @@ window.loadSamples = function (user) {
 
             let sampleHTML = `<div id="sample-${doc.id}" class="sample-card">`;
             sampleHTML += `<h3><strong>Whisky:</strong> <span class="sample-name">${sample.name}</span></h3>`;
-            sampleHTML += `<p><strong>Leeftijd:</strong> <span class="sample-age">${sample.age ? (sample.age === "NAS" ? "NAS" : `${sample.age} years`) : ""}</span></p>`;
+            sampleHTML += `<p><strong>Leeftijd:</strong> <span class="sample-age">${sample.age ? (sample.age === "NAS" ? "NAS" : `${sample.age.replace(/ years/g, '')} years`) : ""}</span></p>`;
             sampleHTML += `<p><strong>Type:</strong> <span class="sample-type">${sample.type || ""}</span></p>`;
             sampleHTML += `<p><strong>Grootte:</strong> <span class="sample-size">${sample.size}</span> cl</p>`;
             sampleHTML += `<p><strong>Waarde:</strong> €&nbsp;<span class="sample-value">${parseFloat(sample.value).toFixed(2)}</span></p>`;
@@ -136,35 +136,6 @@ window.enableEditMode = function (docId) {
 window.autoResize = function (element) {
     element.style.height = "auto";
     element.style.height = (element.scrollHeight) + "px";
-};
-
-// 🔹 Wijzigingen opslaan
-window.saveSample = function (docId) {
-    let sampleElement = document.getElementById(`sample-${docId}`);
-    let updatedData = {
-        name: sampleElement.querySelector(".sample-name input").value.trim(),
-        size: sampleElement.querySelector(".sample-size input").value.trim(),
-        value: parseFloat(sampleElement.querySelector(".sample-value input").value.trim()),
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    };
-
-    let optionalFields = ["age", "type", "cask", "notes", "whiskyBase"];
-    optionalFields.forEach(field => {
-        let inputElement = sampleElement.querySelector(`.sample-${field} input, .sample-${field} textarea`);
-        if (inputElement) {
-            let value = inputElement.value.trim();
-            if (value) updatedData[field] = value;
-        }
-    });
-
-    db.collection("samples").doc(docId).update(updatedData)
-        .then(() => {
-            alert("✅ Sample bijgewerkt!");
-            loadSamples();
-        })
-        .catch(error => {
-            console.error("❌ Fout bij bijwerken:", error);
-        });
 };
 
 // 🔹 Sample verwijderen
