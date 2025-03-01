@@ -271,27 +271,38 @@ window.enableEditMode = function (docId) {
         value: sampleElement.querySelector(".sample-value"),
         cask: sampleElement.querySelector(".sample-cask"),
         notes: sampleElement.querySelector(".sample-notes"),
-        whiskyBase: sampleElement.querySelector(".sample-whiskybase")
+        whiskyBase: sampleElement.querySelector(".sample-whiskybase a") // Zorgt ervoor dat de link correct wordt bewerkt
     };
 
     Object.keys(fields).forEach(key => {
         if (fields[key]) {
             let currentValue = fields[key].innerText || "";
-            if (key === "value") {
-                currentValue = currentValue.replace("€", "").trim();
-            }
+            
+            // Specifieke aanpassing voor de Whiskybase-link
             if (key === "whiskyBase") {
-    let linkElement = fields[key].querySelector("a");
-    currentValue = linkElement ? linkElement.getAttribute("href") : "";
-}
+                currentValue = fields[key].getAttribute("href") || "";
+            }
+
             fields[key].innerHTML = `<input type="text" value="${currentValue}" class="edit-input">`;
+
+            // Zorg dat opmerkingenveld automatisch mee groeit
+            if (key === "notes") {
+                let textarea = document.createElement("textarea");
+                textarea.classList.add("edit-input");
+                textarea.value = currentValue;
+                textarea.oninput = function () { autoResize(this); };
+                fields[key].innerHTML = "";
+                fields[key].appendChild(textarea);
+                autoResize(textarea);
+            }
         }
     });
 
-    // Vervang bewerkknop door opslaanknop + annuleerknop
+    // Verander de bewerkknop naar opslaan
     editButton.innerText = "Opslaan";
     editButton.setAttribute("onclick", `saveSample('${docId}')`);
 
+    // Annuleerknop toevoegen
     let cancelButton = document.createElement("button");
     cancelButton.innerText = "Annuleren";
     cancelButton.setAttribute("onclick", `cancelEdit('${docId}')`);
@@ -313,29 +324,26 @@ window.saveSample = function (docId) {
 
     let optionalFields = ["age", "type", "cask", "notes", "whiskyBase"];
     optionalFields.forEach(field => {
-        let inputElement = sampleElement.querySelector(`.sample-${field} input`);
+        let inputElement = sampleElement.querySelector(`.sample-${field} input, .sample-${field} textarea`);
         if (inputElement) {
             let value = inputElement.value.trim();
-            if (sample.whiskyBaseLink) {
-    sampleHTML += `<p><strong>Whiskybase:</strong> <a class="sample-whiskybase" href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer">${sample.whiskyBaseLink}</a></p>`;
-} else {
-    sampleHTML += `<p><strong>Whiskybase:</strong> <span class="sample-whiskybase">Geen link</span></p>`;
-}
-
+            if (value) {
+                updatedData[field] = field === "whiskyBase" ? value : value;
+            }
         }
     });
 
     db.collection("samples").doc(docId).update(updatedData)
-    .then(() => {
-        alert("✅ Sample bijgewerkt!");
-        enableViewMode(docId);
-    })
+        .then(() => {
+            alert("✅ Sample bijgewerkt!");
+            enableViewMode(docId);
+        })
         .catch(error => {
             console.error("❌ Fout bij bijwerken:", error);
             alert("❌ Er ging iets mis bij het opslaan.");
         });
 
-    // Bewerk- en verwijderknoppen blijven zichtbaar
+    // Knoppen terugzetten naar bewerken
     editButton.innerText = "Bewerken";
     editButton.setAttribute("onclick", `enableEditMode('${docId}')`);
 
@@ -348,8 +356,37 @@ window.cancelEdit = function (docId) {
 };
 
 window.enableViewMode = function (docId) {
-    loadSamples();
-};
+    let sampleElement = document.getElementById(`sample-${docId}`);
+    let editButton = document.getElementById(`edit-btn-${docId}`);
 
+    let sample = db.collection("samples").doc(docId).get().then(doc => {
+        if (doc.exists) {
+            let data = doc.data();
+
+            sampleElement.querySelector(".sample-name").innerText = data.name;
+            sampleElement.querySelector(".sample-age").innerText = data.age ? `${data.age} years` : "";
+            sampleElement.querySelector(".sample-type").innerText = data.type || "";
+            sampleElement.querySelector(".sample-size").innerText = `${data.size} cl`;
+            sampleElement.querySelector(".sample-value").innerText = `€ ${parseFloat(data.value).toFixed(2)}`;
+            sampleElement.querySelector(".sample-cask").innerText = data.cask || "";
+            sampleElement.querySelector(".sample-notes").innerText = data.notes || "";
+            
+            if (data.whiskyBaseLink) {
+                sampleElement.querySelector(".sample-whiskybase").innerHTML = `<a href="${data.whiskyBaseLink}" target="_blank">${data.whiskyBaseLink}</a>`;
+            } else {
+                sampleElement.querySelector(".sample-whiskybase").innerText = "Geen link";
+            }
+
+            // Knoppen terugzetten
+            editButton.innerText = "Bewerken";
+            editButton.setAttribute("onclick", `enableEditMode('${docId}')`);
+
+            let cancelButton = document.getElementById(`cancel-btn-${docId}`);
+            if (cancelButton) cancelButton.remove();
+        }
+    }).catch(error => {
+        console.error("❌ Fout bij ophalen sample:", error);
+    });
+};
 
 console.log("Script is volledig geladen!");
