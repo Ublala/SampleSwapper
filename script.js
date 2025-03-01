@@ -247,6 +247,12 @@ window.loadSamples = function (user) {
             sampleHTML += `</div>`;
 
             document.getElementById("sampleList").innerHTML += sampleHTML;
+            
+            let sampleElement = document.createElement("div");
+sampleElement.classList.add("sample-card");
+sampleElement.id = `sample-${doc.id}`;  // ✅ Belangrijk! Dit zorgt ervoor dat de ID correct is
+sampleElement.innerHTML = sampleHTML;
+
         });
     });
 };
@@ -286,7 +292,7 @@ window.enableEditMode = function (docId) {
         }
     });
 
-    // Verander bewerkknop in opslaanknop
+    // ✅ Wijzig de bewerkknop naar een opslaanknop
     editButton.innerText = "Opslaan";
     editButton.setAttribute("onclick", `saveSample('${docId}')`);
 };
@@ -322,6 +328,22 @@ window.saveSample = function (docId) {
         alert("⚠️ Naam, grootte en waarde zijn verplicht!");
         return;
     }
+
+    // ✅ Update Firestore
+    db.collection("samples").doc(docId).update(updatedData)
+        .then(() => {
+            alert("✅ Sample bijgewerkt!");
+            loadSamples(); // Herlaad de lijst om de wijzigingen te tonen
+        })
+        .catch(error => {
+            console.error("❌ Fout bij bijwerken:", error);
+            alert("❌ Er ging iets mis bij het opslaan.");
+        });
+
+    // ✅ Zet opslaanknop terug naar bewerkknop
+    editButton.innerText = "Bewerken";
+    editButton.setAttribute("onclick", `enableEditMode('${docId}')`);
+};
 
     // Update Firestore
     db.collection("samples").doc(docId).update(updatedData)
