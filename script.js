@@ -13,10 +13,6 @@ firebase.initializeApp(firebaseConfig);
 window.auth = firebase.auth();
 window.db = firebase.firestore();
 
-// 🔹 Controleer of Firebase correct is geladen
-console.log("✅ Firebase is geladen:", firebase);
-console.log("✅ Firestore Database:", db);
-
 // 🔹 Controleer of een gebruiker is ingelogd en pas UI aan
 window.checkUser = function () {
     auth.onAuthStateChanged(user => {
@@ -27,7 +23,7 @@ window.checkUser = function () {
         } else {
             document.getElementById("userStatus").innerText = "❌ Niet ingelogd";
             document.getElementById("logoutButton").style.display = "none";
-            document.getElementById("sampleList").innerHTML = ""; // ✅ Verwijder samples bij uitloggen
+            document.getElementById("sampleList").innerHTML = ""; // ✅ Voorkomt dubbele kaarten bij uitloggen
         }
     });
 };
@@ -40,6 +36,7 @@ window.login = function () {
     auth.signInWithEmailAndPassword(email, password)
         .then(() => {
             alert("✅ Inloggen succesvol!");
+            document.getElementById("sampleList").innerHTML = ""; // ✅ Voorkomt dubbele kaarten
             checkUser();
         })
         .catch(error => {
@@ -82,7 +79,7 @@ window.loadSamples = function (user) {
             sampleHTML += `<p><strong>Cask:</strong> <span class="sample-cask">${sample.cask || ""}</span></p>`;
             sampleHTML += `<p><strong>Opmerkingen:</strong> <span class="sample-notes">${sample.notes || ""}</span></p>`;
 
-            // ✅ Correcte weergave van de Whiskybase-link ZONDER AANHEF
+            // ✅ Correcte weergave van de Whiskybase-link (ZONDER "Whiskybase:" erboven)
             if (sample.whiskyBaseLink) {
                 sampleHTML += `<p><a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer">Whiskybase</a></p>`;
             }
@@ -138,6 +135,35 @@ window.enableEditMode = function (docId) {
 window.autoResize = function (element) {
     element.style.height = "auto";
     element.style.height = (element.scrollHeight) + "px";
+};
+
+// 🔹 Sample opslaan
+window.saveSample = function (docId) {
+    let sampleElement = document.getElementById(`sample-${docId}`);
+    let updatedData = {
+        name: sampleElement.querySelector(".sample-name input").value.trim(),
+        size: sampleElement.querySelector(".sample-size input").value.trim(),
+        value: parseFloat(sampleElement.querySelector(".sample-value input").value.trim()),
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    let optionalFields = ["age", "type", "cask", "notes", "whiskyBase"];
+    optionalFields.forEach(field => {
+        let inputElement = sampleElement.querySelector(`.sample-${field} input, .sample-${field} textarea`);
+        if (inputElement) {
+            let value = inputElement.value.trim();
+            if (value) updatedData[field] = value;
+        }
+    });
+
+    db.collection("samples").doc(docId).update(updatedData)
+        .then(() => {
+            alert("✅ Sample bijgewerkt!");
+            loadSamples();
+        })
+        .catch(error => {
+            console.error("❌ Fout bij bijwerken:", error);
+        });
 };
 
 // 🔹 Sample verwijderen
