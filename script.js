@@ -205,49 +205,48 @@ window.loadSamples = function (user) {
             let sample = doc.data();
             let isOwner = user && sample.userId === user.uid;
 
-            let sampleHTML = `<h3>${sample.name}</h3>`;
+            let sampleHTML = `
+                <div class="sample-card" id="sample-${doc.id}">
+                    <h3 class="sample-name">${sample.name}</h3>
+            `;
 
-            // ✅ Leeftijd tonen (apart en met 'years' als het een getal is)
+            // ✅ Leeftijd tonen (met "years" als het een getal is)
             if (sample.age) {
-    let formattedAge = sample.age.toUpperCase() === "NAS" ? "NAS" : `${sample.age} years`;
-    sampleHTML += `<p><strong>Leeftijd:</strong> ${formattedAge}</p>`;
-}
-            if (sample.type) {
-                sampleHTML += `<p><strong>Type:</strong> ${sample.type}</p>`;
+                let formattedAge = sample.age.toUpperCase() === "NAS" ? "NAS" : `${sample.age} years`;
+                sampleHTML += `<p class="sample-age"><strong>Leeftijd:</strong> ${formattedAge}</p>`;
             }
 
-            sampleHTML += `<p><strong>Grootte:</strong> ${sample.size} cl</p>`; // Altijd tonen
-           let value = parseFloat(sample.value);
-sampleHTML += `<p><strong>Waarde:</strong> €&nbsp;${!isNaN(value) ? value.toFixed(2) : sample.value}</p>`;
-            
+            if (sample.type) {
+                sampleHTML += `<p class="sample-type"><strong>Type:</strong> ${sample.type}</p>`;
+            }
+
+            sampleHTML += `<p class="sample-size"><strong>Grootte:</strong> ${sample.size} cl</p>`;
+
+            let value = parseFloat(sample.value);
+            sampleHTML += `<p class="sample-value"><strong>Waarde:</strong> €&nbsp;${!isNaN(value) ? value.toFixed(2) : sample.value}</p>`;
+
             if (sample.cask) {
-                sampleHTML += `<p><strong>Cask:</strong> ${sample.cask}</p>`;
+                sampleHTML += `<p class="sample-cask"><strong>Cask:</strong> ${sample.cask}</p>`;
             }
 
             if (sample.notes) {
-                sampleHTML += `<p><strong>Opmerkingen:</strong> ${sample.notes}</p>`;
+                sampleHTML += `<p class="sample-notes"><strong>Opmerkingen:</strong> ${sample.notes}</p>`;
             }
 
             if (sample.whiskyBaseLink) {
-                sampleHTML += `<p><a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer">Whiskybase</a></p>`;
+                sampleHTML += `<p class="sample-whiskybase"><a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer">Whiskybase</a></p>`;
             }
 
             if (isOwner) {
-                sampleHTML += `<button onclick="deleteSample('${doc.id}')">Verwijderen</button>`;
+                sampleHTML += `
+                    <button id="edit-btn-${doc.id}" onclick="enableEditMode('${doc.id}')">Bewerken</button>
+                    <button onclick="deleteSample('${doc.id}')">Verwijderen</button>
+                `;
             }
-            if (isOwner) {
-    sampleHTML += `
-        <button id="edit-btn-${doc.id}" onclick="enableEditMode('${doc.id}')">Bewerken</button>
-        <button onclick="deleteSample('${doc.id}')">Verwijderen</button>
-    `;
-}
 
+            sampleHTML += `</div>`;
 
-            let sampleElement = document.createElement("div");
-            sampleElement.classList.add("sample-card");
-            sampleElement.innerHTML = sampleHTML;
-
-            document.getElementById("sampleList").appendChild(sampleElement);
+            document.getElementById("sampleList").innerHTML += sampleHTML;
         });
     });
 };
@@ -276,17 +275,17 @@ window.enableEditMode = function (docId) {
     let notesField = sampleElement.querySelector(".sample-notes");
     let whiskyBaseField = sampleElement.querySelector(".sample-whiskybase");
 
-    // Zet bestaande waarden om naar invoervelden
+    // Zet tekst om naar invoervelden
     nameField.innerHTML = `<input type="text" value="${nameField.innerText}" class="edit-input">`;
     ageField.innerHTML = `<input type="text" value="${ageField.innerText.replace(' years', '')}" class="edit-input">`;
     typeField.innerHTML = `<input type="text" value="${typeField.innerText}" class="edit-input">`;
     sizeField.innerHTML = `<input type="number" value="${sizeField.innerText.replace(' cl', '')}" class="edit-input">`;
-    valueField.innerHTML = `<input type="number" value="${valueField.innerText.replace('€', '').trim()}" class="edit-input">`;
+    valueField.innerHTML = `<input type="number" step="0.01" value="${valueField.innerText.replace('€', '').trim()}" class="edit-input">`;
     caskField.innerHTML = `<input type="text" value="${caskField.innerText}" class="edit-input">`;
     notesField.innerHTML = `<input type="text" value="${notesField.innerText}" class="edit-input">`;
     whiskyBaseField.innerHTML = `<input type="text" value="${whiskyBaseField.innerText}" class="edit-input">`;
 
-    // Wijzig de bewerkknop naar een opslaanknop
+    // Verander bewerkknop naar opslaanknop
     editButton.innerText = "Opslaan";
     editButton.setAttribute("onclick", `saveSample('${docId}')`);
 };
@@ -335,7 +334,7 @@ window.saveSample = function (docId) {
             alert("❌ Er ging iets mis bij het opslaan.");
         });
 
-    // Wijzig opslaanknop terug naar bewerkknop
+    // Verander opslaanknop terug naar bewerkknop
     editButton.innerText = "Bewerken";
     editButton.setAttribute("onclick", `enableEditMode('${docId}')`);
 };
