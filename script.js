@@ -18,7 +18,6 @@ window.db = firebase.firestore();
 // 🔹 Controleer of Firebase correct is geladen
 console.log("✅ Firebase is geladen:", firebase);
 console.log("✅ Firestore Database:", db);
-console.log("✅ Firebase Authentication:", auth);
 
 // 🔹 Automatisch tekstvakhoogte aanpassen
 window.autoResize = function (element) {
@@ -26,26 +25,9 @@ window.autoResize = function (element) {
     element.style.height = (element.scrollHeight) + "px";
 };
 
-// 🔹 Gebruiker Inloggen
-window.login = function () {
-    let email = document.getElementById("email").value;
-    let password = document.getElementById("password").value;
-
-    auth.signInWithEmailAndPassword(email, password)
-        .then(() => {
-            alert("✅ Inloggen succesvol!");
-            checkUser();
-        })
-        .catch(error => {
-            console.error("❌ Fout bij inloggen:", error);
-            alert("❌ Fout: " + error.message);
-        });
-};
-
 // 🔹 Controleer automatisch bij opstarten of gebruiker ingelogd is
 window.onload = () => {
     auth.onAuthStateChanged(user => {
-        checkUser();
         loadSamples(user);
     });
 };
@@ -67,10 +49,11 @@ window.loadSamples = function (user) {
             sampleHTML += `<p><strong>Waarde:</strong> €&nbsp;<span class="sample-value">${parseFloat(sample.value).toFixed(2)}</span></p>`;
             sampleHTML += sample.cask ? `<p><strong>Cask:</strong> <span class="sample-cask">${sample.cask}</span></p>` : "";
             sampleHTML += sample.notes ? `<p><strong>Opmerkingen:</strong> <span class="sample-notes">${sample.notes}</span></p>` : "";
+            
+            // 🔹 Correcte Whiskybase weergave
             if (sample.whiskyBaseLink) {
-    sampleHTML += `<p><strong>Whiskybase:</strong> <a class="sample-whiskybase" href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer">Whiskybase</a></p>`;
-}
-href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer">Whiskybase</a></p>` : "";
+                sampleHTML += `<p><strong>Whiskybase:</strong> <a class="sample-whiskybase" href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer">Whiskybase</a></p>`;
+            }
 
             if (isOwner) {
                 sampleHTML += `
@@ -142,13 +125,8 @@ window.saveSample = function (docId) {
         if (inputElement) {
             let value = inputElement.value.trim();
             if (value) {
-                updatedData[field] = field === "whiskyBase" ? value : value;
+                updatedData[field] = value;
             }
-            if (updatedData.whiskyBase) {
-    updatedData.whiskyBaseLink = updatedData.whiskyBase;
-    delete updatedData.whiskyBase; // Verwijder de tijdelijke opslag
-}
-
         }
     });
 
@@ -161,24 +139,16 @@ window.saveSample = function (docId) {
             console.error("❌ Fout bij bijwerken:", error);
             alert("❌ Er ging iets mis bij het opslaan.");
         });
-
-    let cancelButton = document.getElementById(`cancel-btn-${docId}`);
-    if (cancelButton) cancelButton.remove();
-};
-
-// 🔹 Annuleren van bewerking zonder opslaan
-window.cancelEdit = function (docId) {
-    loadSamples();
 };
 
 // 🔹 Sample Verwijderen uit Database
 window.deleteSample = function (id) {
     db.collection("samples").doc(id).delete().then(() => {
         alert("✅ Sample verwijderd!");
-        loadSamples(); // Herlaadt direct de lijst, zodat knoppen blijven werken
+        loadSamples();
     }).catch(error => {
         console.error("❌ Fout bij verwijderen: ", error);
     });
 };
 
-console.log("Script is volledig geladen!");
+console.log("✅ Script is volledig geladen!");
