@@ -73,7 +73,7 @@ window.loadSamples = function (user) {
             let isOwner = user && sample.userId === user.uid;
 
             let sampleHTML = `<div id="sample-${doc.id}" class="sample-card">`;
-            sampleHTML += `<h3 class="sample-name">${sample.name}</h3>`;
+            sampleHTML += `<h3><strong>Whisky:</strong> <span class="sample-name">${sample.name}</span></h3>`;
             sampleHTML += `<p><strong>Leeftijd:</strong> <span class="sample-age">${sample.age ? (sample.age === "NAS" ? "NAS" : `${sample.age} years`) : ""}</span></p>`;
             sampleHTML += `<p><strong>Type:</strong> <span class="sample-type">${sample.type || ""}</span></p>`;
             sampleHTML += `<p><strong>Grootte:</strong> <span class="sample-size">${sample.size}</span> cl</p>`;
@@ -116,7 +116,11 @@ window.enableEditMode = function (docId) {
             value = linkElement ? linkElement.getAttribute("href") : "";
         }
 
-        fieldElement.innerHTML = `<input type="text" value="${value}" class="edit-input">`;
+        if (field === "notes") {
+            fieldElement.innerHTML = `<textarea class="edit-input" oninput="autoResize(this)">${value}</textarea>`;
+        } else {
+            fieldElement.innerHTML = `<input type="text" value="${value}" class="edit-input">`;
+        }
     });
 
     editButton.innerText = "Opslaan";
@@ -126,6 +130,12 @@ window.enableEditMode = function (docId) {
     cancelButton.innerText = "Annuleren";
     cancelButton.setAttribute("onclick", `loadSamples()`);
     sampleElement.appendChild(cancelButton);
+};
+
+// 🔹 Automatisch hoogte aanpassen voor opmerkingenveld
+window.autoResize = function (element) {
+    element.style.height = "auto";
+    element.style.height = (element.scrollHeight) + "px";
 };
 
 // 🔹 Wijzigingen opslaan
@@ -140,7 +150,7 @@ window.saveSample = function (docId) {
 
     let optionalFields = ["age", "type", "cask", "notes", "whiskyBase"];
     optionalFields.forEach(field => {
-        let inputElement = sampleElement.querySelector(`.sample-${field} input`);
+        let inputElement = sampleElement.querySelector(`.sample-${field} input, .sample-${field} textarea`);
         if (inputElement) {
             let value = inputElement.value.trim();
             if (value) updatedData[field] = value;
