@@ -235,6 +235,13 @@ sampleHTML += `<p><strong>Waarde:</strong> €&nbsp;${!isNaN(value) ? value.toFi
             if (isOwner) {
                 sampleHTML += `<button onclick="deleteSample('${doc.id}')">Verwijderen</button>`;
             }
+            if (isOwner) {
+    sampleHTML += `
+        <button id="edit-btn-${doc.id}" onclick="enableEditMode('${doc.id}')">Bewerken</button>
+        <button onclick="deleteSample('${doc.id}')">Verwijderen</button>
+    `;
+}
+
 
             let sampleElement = document.createElement("div");
             sampleElement.classList.add("sample-card");
