@@ -255,4 +255,82 @@ window.deleteSample = function (id) {
     });
 };
 
+// 🔹 Voeg inline bewerkingsfunctionaliteit toe aan sample cards
+window.enableEditMode = function (docId) {
+    let sampleElement = document.getElementById(`sample-${docId}`);
+    let editButton = document.getElementById(`edit-btn-${docId}`);
+
+    let nameField = sampleElement.querySelector(".sample-name");
+    let ageField = sampleElement.querySelector(".sample-age");
+    let typeField = sampleElement.querySelector(".sample-type");
+    let sizeField = sampleElement.querySelector(".sample-size");
+    let valueField = sampleElement.querySelector(".sample-value");
+    let caskField = sampleElement.querySelector(".sample-cask");
+    let notesField = sampleElement.querySelector(".sample-notes");
+    let whiskyBaseField = sampleElement.querySelector(".sample-whiskybase");
+
+    // Zet bestaande waarden om naar invoervelden
+    nameField.innerHTML = `<input type="text" value="${nameField.innerText}" class="edit-input">`;
+    ageField.innerHTML = `<input type="text" value="${ageField.innerText.replace(' years', '')}" class="edit-input">`;
+    typeField.innerHTML = `<input type="text" value="${typeField.innerText}" class="edit-input">`;
+    sizeField.innerHTML = `<input type="number" value="${sizeField.innerText.replace(' cl', '')}" class="edit-input">`;
+    valueField.innerHTML = `<input type="number" value="${valueField.innerText.replace('€', '').trim()}" class="edit-input">`;
+    caskField.innerHTML = `<input type="text" value="${caskField.innerText}" class="edit-input">`;
+    notesField.innerHTML = `<input type="text" value="${notesField.innerText}" class="edit-input">`;
+    whiskyBaseField.innerHTML = `<input type="text" value="${whiskyBaseField.innerText}" class="edit-input">`;
+
+    // Wijzig de bewerkknop naar een opslaanknop
+    editButton.innerText = "Opslaan";
+    editButton.setAttribute("onclick", `saveSample('${docId}')`);
+};
+
+// 🔹 Functie om wijzigingen op te slaan
+window.saveSample = function (docId) {
+    let sampleElement = document.getElementById(`sample-${docId}`);
+    let editButton = document.getElementById(`edit-btn-${docId}`);
+
+    let name = sampleElement.querySelector(".sample-name input").value.trim();
+    let age = sampleElement.querySelector(".sample-age input").value.trim();
+    let type = sampleElement.querySelector(".sample-type input").value.trim();
+    let size = sampleElement.querySelector(".sample-size input").value.trim();
+    let value = sampleElement.querySelector(".sample-value input").value.trim();
+    let cask = sampleElement.querySelector(".sample-cask input").value.trim();
+    let notes = sampleElement.querySelector(".sample-notes input").value.trim();
+    let whiskyBaseLink = sampleElement.querySelector(".sample-whiskybase input").value.trim();
+
+    // Controleer invoer
+    if (name === "" || size === "" || value === "") {
+        alert("⚠️ Naam, grootte en waarde zijn verplicht!");
+        return;
+    }
+
+    let updatedData = {
+        name,
+        size,
+        value: parseFloat(value),
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    if (age) updatedData.age = age.match(/^\d+$/) ? `${age} years` : age;
+    if (type) updatedData.type = type;
+    if (cask) updatedData.cask = cask;
+    if (notes) updatedData.notes = notes;
+    if (whiskyBaseLink) updatedData.whiskyBaseLink = whiskyBaseLink;
+
+    // Update Firestore
+    db.collection("samples").doc(docId).update(updatedData)
+        .then(() => {
+            alert("✅ Sample bijgewerkt!");
+            loadSamples();
+        })
+        .catch(error => {
+            console.error("❌ Fout bij bijwerken:", error);
+            alert("❌ Er ging iets mis bij het opslaan.");
+        });
+
+    // Wijzig opslaanknop terug naar bewerkknop
+    editButton.innerText = "Bewerken";
+    editButton.setAttribute("onclick", `enableEditMode('${docId}')`);
+};
+
 console.log("Script is volledig geladen!");
