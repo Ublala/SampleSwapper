@@ -67,7 +67,10 @@ window.loadSamples = function (user) {
             sampleHTML += `<p><strong>Waarde:</strong> €&nbsp;<span class="sample-value">${parseFloat(sample.value).toFixed(2)}</span></p>`;
             sampleHTML += sample.cask ? `<p><strong>Cask:</strong> <span class="sample-cask">${sample.cask}</span></p>` : "";
             sampleHTML += sample.notes ? `<p><strong>Opmerkingen:</strong> <span class="sample-notes">${sample.notes}</span></p>` : "";
-            sampleHTML += sample.whiskyBaseLink ? `<p><strong>Whiskybase:</strong> <a class="sample-whiskybase" href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer">Whiskybase</a></p>` : "";
+            if (sample.whiskyBaseLink) {
+    sampleHTML += `<p><strong>Whiskybase:</strong> <a class="sample-whiskybase" href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer">Whiskybase</a></p>`;
+}
+href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer">Whiskybase</a></p>` : "";
 
             if (isOwner) {
                 sampleHTML += `
@@ -141,6 +144,11 @@ window.saveSample = function (docId) {
             if (value) {
                 updatedData[field] = field === "whiskyBase" ? value : value;
             }
+            if (updatedData.whiskyBase) {
+    updatedData.whiskyBaseLink = updatedData.whiskyBase;
+    delete updatedData.whiskyBase; // Verwijder de tijdelijke opslag
+}
+
         }
     });
 
@@ -167,7 +175,7 @@ window.cancelEdit = function (docId) {
 window.deleteSample = function (id) {
     db.collection("samples").doc(id).delete().then(() => {
         alert("✅ Sample verwijderd!");
-        loadSamples();
+        loadSamples(); // Herlaadt direct de lijst, zodat knoppen blijven werken
     }).catch(error => {
         console.error("❌ Fout bij verwijderen: ", error);
     });
