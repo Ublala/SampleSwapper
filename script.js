@@ -281,8 +281,9 @@ window.enableEditMode = function (docId) {
                 currentValue = currentValue.replace("€", "").trim();
             }
             if (key === "whiskyBase") {
-                currentValue = fields[key].getAttribute("href") || "";
-            }
+    let linkElement = fields[key].querySelector("a");
+    currentValue = linkElement ? linkElement.getAttribute("href") : "";
+}
             fields[key].innerHTML = `<input type="text" value="${currentValue}" class="edit-input">`;
         }
     });
@@ -315,17 +316,20 @@ window.saveSample = function (docId) {
         let inputElement = sampleElement.querySelector(`.sample-${field} input`);
         if (inputElement) {
             let value = inputElement.value.trim();
-            if (value) {
-                updatedData[field] = field === "whiskyBase" ? value : value; 
-            }
+            if (sample.whiskyBaseLink) {
+    sampleHTML += `<p><strong>Whiskybase:</strong> <a class="sample-whiskybase" href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer">${sample.whiskyBaseLink}</a></p>`;
+} else {
+    sampleHTML += `<p><strong>Whiskybase:</strong> <span class="sample-whiskybase">Geen link</span></p>`;
+}
+
         }
     });
 
     db.collection("samples").doc(docId).update(updatedData)
-        .then(() => {
-            alert("✅ Sample bijgewerkt!");
-            loadSamples();
-        })
+    .then(() => {
+        alert("✅ Sample bijgewerkt!");
+        enableViewMode(docId);
+    })
         .catch(error => {
             console.error("❌ Fout bij bijwerken:", error);
             alert("❌ Er ging iets mis bij het opslaan.");
@@ -341,6 +345,10 @@ window.saveSample = function (docId) {
 
 window.cancelEdit = function (docId) {
     loadSamples(); // Herlaad de samples om de originele weergave terug te zetten
+};
+
+window.enableViewMode = function (docId) {
+    loadSamples();
 };
 
 
