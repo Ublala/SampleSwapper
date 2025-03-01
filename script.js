@@ -27,7 +27,7 @@ window.checkUser = function () {
         } else {
             document.getElementById("userStatus").innerText = "❌ Niet ingelogd";
             document.getElementById("logoutButton").style.display = "none";
-            loadSamples(null);
+            document.getElementById("sampleList").innerHTML = ""; // ✅ Verwijder samples bij uitloggen
         }
     });
 };
@@ -52,7 +52,7 @@ window.login = function () {
 window.logout = function () {
     auth.signOut().then(() => {
         alert("✅ Uitgelogd!");
-        window.location.reload(); // ✅ Voorkomt verdubbeling van samplecards
+        document.getElementById("sampleList").innerHTML = ""; // ✅ Voorkomt dubbele kaarten bij opnieuw inloggen
     }).catch(error => {
         console.error("❌ Fout bij uitloggen:", error);
     });
@@ -74,7 +74,7 @@ window.loadSamples = function (user) {
             let isOwner = user && sample.userId === user.uid;
 
             let sampleHTML = `<div id="sample-${doc.id}" class="sample-card">`;
-            sampleHTML += `<h3><strong>Whisky:</strong> <span class="sample-name">${sample.name}</span></h3>`;
+            sampleHTML += `<p><strong>Whisky:</strong> <span class="sample-name">${sample.name}</span></p>`;
             sampleHTML += `<p><strong>Leeftijd:</strong> <span class="sample-age">${sample.age ? sample.age.replace(/ years/g, '') + " years" : ""}</span></p>`;
             sampleHTML += `<p><strong>Type:</strong> <span class="sample-type">${sample.type || ""}</span></p>`;
             sampleHTML += `<p><strong>Grootte:</strong> <span class="sample-size">${sample.size}</span> cl</p>`;
@@ -130,6 +130,7 @@ window.enableEditMode = function (docId) {
     let cancelButton = document.createElement("button");
     cancelButton.innerText = "Annuleren";
     cancelButton.setAttribute("onclick", `loadSamples()`);
+    cancelButton.id = `cancel-btn-${docId}`;
     sampleElement.appendChild(cancelButton);
 };
 
