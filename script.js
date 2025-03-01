@@ -1,4 +1,4 @@
-// 🔹 Firebase Configuratie (vervang met jouw Firebase-config)
+// 🔹 Firebase Configuratie
 const firebaseConfig = {
     apiKey: "AIzaSyAhKPrwi66YsMtxnpeINOfVT0LC67KG5tw",
     authDomain: "sampleswapper.firebaseapp.com",
@@ -10,8 +10,6 @@ const firebaseConfig = {
 
 // 🔹 Firebase Initialiseren
 firebase.initializeApp(firebaseConfig);
-
-// 🔹 Firebase Services Globaal Beschikbaar Maken
 window.auth = firebase.auth();
 window.db = firebase.firestore();
 
@@ -19,20 +17,7 @@ window.db = firebase.firestore();
 console.log("✅ Firebase is geladen:", firebase);
 console.log("✅ Firestore Database:", db);
 
-// 🔹 Automatisch tekstvakhoogte aanpassen
-window.autoResize = function (element) {
-    element.style.height = "auto";
-    element.style.height = (element.scrollHeight) + "px";
-};
-
-// 🔹 Controleer automatisch bij opstarten of gebruiker ingelogd is
-window.onload = () => {
-    auth.onAuthStateChanged(user => {
-        loadSamples(user);
-    });
-};
-
-// 🔹 Gebruiker Inloggen (FIXED)
+// 🔹 Inloggen functionaliteit
 window.login = function () {
     let email = document.getElementById("email").value;
     let password = document.getElementById("password").value;
@@ -40,7 +25,7 @@ window.login = function () {
     auth.signInWithEmailAndPassword(email, password)
         .then(() => {
             alert("✅ Inloggen succesvol!");
-            loadSamples(auth.currentUser);
+            checkUser();
         })
         .catch(error => {
             console.error("❌ Fout bij inloggen:", error);
@@ -48,7 +33,15 @@ window.login = function () {
         });
 };
 
-// 🔹 Samples Ophalen uit Database en Weergeven (FIXED)
+// 🔹 Automatisch controleren of gebruiker ingelogd is
+window.onload = () => {
+    auth.onAuthStateChanged(user => {
+        checkUser();
+        loadSamples(user);
+    });
+};
+
+// 🔹 Samples ophalen en weergeven
 window.loadSamples = function (user) {
     document.getElementById("sampleList").innerHTML = "";
 
@@ -65,10 +58,10 @@ window.loadSamples = function (user) {
             sampleHTML += `<p><strong>Waarde:</strong> €&nbsp;<span class="sample-value">${parseFloat(sample.value).toFixed(2)}</span></p>`;
             sampleHTML += sample.cask ? `<p><strong>Cask:</strong> <span class="sample-cask">${sample.cask}</span></p>` : "";
             sampleHTML += sample.notes ? `<p><strong>Opmerkingen:</strong> <span class="sample-notes">${sample.notes}</span></p>` : "";
-
-            // 🔹 Correcte Whiskybase weergave (FIXED)
+            
+            // ✅ Corrigeer de Whiskybase-linkweergave
             if (sample.whiskyBaseLink) {
-                sampleHTML += `<p><strong>Whiskybase:</strong> <a class="sample-whiskybase" href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer">Whiskybase</a></p>`;
+                sampleHTML += `<p><strong>Whiskybase:</strong> <a class="sample-whiskybase" href="${sample.whiskyBaseLink}" target="_blank">Whiskybase</a></p>`;
             }
 
             if (isOwner) {
@@ -86,11 +79,89 @@ window.loadSamples = function (user) {
     });
 };
 
-// 🔹 Sample Verwijderen uit Database (FIXED)
+// 🔹 Inschakelen van bewerkingsmodus
+window.enableEditMode = function (docId) {
+    let sampleElement = document.getElementById(`sample-${docId}`);
+    let editButton = document.getElementById(`edit-btn-${docId}`);
+
+    let fields = ["name", "age", "type", "size", "value", "cask", "notes", "whiskyBase"];
+    fields.forEach(field => {
+        let fieldElement = sampleElement.querySelector(`.sample-${field}`);
+        if (fieldElement) {
+            let value = fieldElement.innerText || "";
+            if (field === "whiskyBase") {
+                let linkElement = fieldElement.querySelector("a");
+                value = linkElement ? linkElement.getAttribute("href") : "";
+            }
+            fieldElement.innerHTML = `<input type="text" value="${value}" class="edit-input">`;
+
+            if (field === "notes") {
+                let textarea = document.createElement("textarea");
+                textarea.classList.add("edit-input");
+                textarea.value = value;
+                textarea.oninput = function () { autoResize(this); };
+                fieldElement.innerHTML = "";
+                fieldElement.appendChild(textarea);
+                autoResize(textarea);
+            }
+        }
+    });
+
+    // ✅ Zorg dat bewerkingsvelden op één regel staan
+    let inputs = sampleElement.querySelectorAll(".edit-input");
+    inputs.forEach(input => {
+        input.style.display = "inline-block";
+        input.style.marginRight = "10px";
+    });
+
+    // Vervang bewerkknop door opslaanknop + annuleerknop
+    editButton.innerText = "Opslaan";
+    editButton.setAttribute("onclick", `saveSample('${docId}')`);
+
+    let cancelButton = document.createElement("button");
+    cancelButton.innerText = "Annuleren";
+    cancelButton.setAttribute("onclick", `cancelEdit('${docId}')`);
+    cancelButton.id = `cancel-btn-${docId}`;
+    sampleElement.appendChild(cancelButton);
+};
+
+// 🔹 Wijzigingen opslaan
+window.saveSample = function (docId) {
+    let sampleElement = document.getElementById(`sample-${docId}`);
+    let updatedData = {
+        name: sampleElement.querySelector(".sample-name input").value.trim(),
+        size: sampleElement.querySelector(".sample-size input").value.trim(),
+        value: parseFloat(sampleElement.querySelector(".sample-value input").value.trim()),
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    let optionalFields = ["age", "type", "cask", "notes", "whiskyBase"];
+    optionalFields.forEach(field => {
+        let inputElement = sampleElement.querySelector(`.sample-${field} input, .sample-${field} textarea`);
+        if (inputElement) {
+            let value = inputElement.value.trim();
+            if (value) {
+                updatedData[field] = value;
+            }
+        }
+    });
+
+    db.collection("samples").doc(docId).update(updatedData)
+        .then(() => {
+            alert("✅ Sample bijgewerkt!");
+            loadSamples();
+        })
+        .catch(error => {
+            console.error("❌ Fout bij bijwerken:", error);
+            alert("❌ Er ging iets mis bij het opslaan.");
+        });
+};
+
+// 🔹 Sample verwijderen
 window.deleteSample = function (id) {
     db.collection("samples").doc(id).delete().then(() => {
         alert("✅ Sample verwijderd!");
-        loadSamples(); // Laad direct opnieuw zodat knoppen blijven werken
+        loadSamples();
     }).catch(error => {
         console.error("❌ Fout bij verwijderen: ", error);
     });
