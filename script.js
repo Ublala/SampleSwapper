@@ -205,36 +205,32 @@ window.loadSamples = function (user) {
             let sample = doc.data();
             let isOwner = user && sample.userId === user.uid;
 
-            let sampleHTML = `
-                <div class="sample-card" id="sample-${doc.id}">
-                    <h3 class="sample-name">${sample.name}</h3>
-            `;
+            let sampleHTML = `<div id="sample-${doc.id}" class="sample-card">`;
+            sampleHTML += `<h3 class="sample-name">${sample.name}</h3>`;
 
-            // ✅ Leeftijd tonen (met "years" als het een getal is)
             if (sample.age) {
                 let formattedAge = sample.age.toUpperCase() === "NAS" ? "NAS" : `${sample.age} years`;
-                sampleHTML += `<p class="sample-age"><strong>Leeftijd:</strong> ${formattedAge}</p>`;
+                sampleHTML += `<p><strong>Leeftijd:</strong> <span class="sample-age">${formattedAge}</span></p>`;
             }
 
             if (sample.type) {
-                sampleHTML += `<p class="sample-type"><strong>Type:</strong> ${sample.type}</p>`;
+                sampleHTML += `<p><strong>Type:</strong> <span class="sample-type">${sample.type}</span></p>`;
             }
 
-            sampleHTML += `<p class="sample-size"><strong>Grootte:</strong> ${sample.size} cl</p>`;
-
+            sampleHTML += `<p><strong>Grootte:</strong> <span class="sample-size">${sample.size}</span> cl</p>`;
             let value = parseFloat(sample.value);
-            sampleHTML += `<p class="sample-value"><strong>Waarde:</strong> €&nbsp;${!isNaN(value) ? value.toFixed(2) : sample.value}</p>`;
+            sampleHTML += `<p><strong>Waarde:</strong> €&nbsp;<span class="sample-value">${!isNaN(value) ? value.toFixed(2) : sample.value}</span></p>`;
 
             if (sample.cask) {
-                sampleHTML += `<p class="sample-cask"><strong>Cask:</strong> ${sample.cask}</p>`;
+                sampleHTML += `<p><strong>Cask:</strong> <span class="sample-cask">${sample.cask}</span></p>`;
             }
 
             if (sample.notes) {
-                sampleHTML += `<p class="sample-notes"><strong>Opmerkingen:</strong> ${sample.notes}</p>`;
+                sampleHTML += `<p><strong>Opmerkingen:</strong> <span class="sample-notes">${sample.notes}</span></p>`;
             }
 
             if (sample.whiskyBaseLink) {
-                sampleHTML += `<p class="sample-whiskybase"><a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer">Whiskybase</a></p>`;
+                sampleHTML += `<p><strong>Whiskybase:</strong> <a class="sample-whiskybase" href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer">${sample.whiskyBaseLink}</a></p>`;
             }
 
             if (isOwner) {
@@ -245,17 +241,11 @@ window.loadSamples = function (user) {
             }
 
             sampleHTML += `</div>`;
-
             document.getElementById("sampleList").innerHTML += sampleHTML;
-            
-            let sampleElement = document.createElement("div");
-sampleElement.classList.add("sample-card");
-sampleElement.id = `sample-${doc.id}`;  // ✅ Belangrijk! Dit zorgt ervoor dat de ID correct is
-sampleElement.innerHTML = sampleHTML;
-
         });
     });
 };
+
 
 // 🔹 Sample Verwijderen uit Database
 window.deleteSample = function (id) {
@@ -272,29 +262,41 @@ window.enableEditMode = function (docId) {
     let sampleElement = document.getElementById(`sample-${docId}`);
     let editButton = document.getElementById(`edit-btn-${docId}`);
 
-    let fields = [
-        { class: "sample-name", type: "text" },
-        { class: "sample-age", type: "text" },
-        { class: "sample-type", type: "text" },
-        { class: "sample-size", type: "number" },
-        { class: "sample-value", type: "number", step: "0.01" },
-        { class: "sample-cask", type: "text" },
-        { class: "sample-notes", type: "text" },
-        { class: "sample-whiskybase", type: "text" }
-    ];
+    // Haal alle velden op
+    let fields = {
+        name: sampleElement.querySelector(".sample-name"),
+        age: sampleElement.querySelector(".sample-age"),
+        type: sampleElement.querySelector(".sample-type"),
+        size: sampleElement.querySelector(".sample-size"),
+        value: sampleElement.querySelector(".sample-value"),
+        cask: sampleElement.querySelector(".sample-cask"),
+        notes: sampleElement.querySelector(".sample-notes"),
+        whiskyBase: sampleElement.querySelector(".sample-whiskybase")
+    };
 
-    fields.forEach(field => {
-        let element = sampleElement.querySelector(`.${field.class}`);
-        if (element) {
-            let value = element.innerText.replace(" cl", "").replace("€", "").trim();
-            let stepAttr = field.step ? `step="${field.step}"` : ""; 
-            element.innerHTML = `<input type="${field.type}" value="${value}" class="edit-input" ${stepAttr}>`;
+    // Converteer velden naar invoervelden
+    Object.keys(fields).forEach(key => {
+        if (fields[key]) {
+            let currentValue = fields[key].innerText || "";
+            if (key === "value") {
+                currentValue = currentValue.replace("€", "").trim(); // Verwijder euroteken
+            }
+            if (key === "whiskyBase") {
+                currentValue = fields[key].getAttribute("href") || ""; // Zorg ervoor dat de link behouden blijft
+            }
+            fields[key].innerHTML = `<input type="text" value="${currentValue}" class="edit-input">`;
         }
     });
 
-    // ✅ Wijzig de bewerkknop naar een opslaanknop
+    // Vervang de bewerkknop door een opslaanknop en een annuleerknop
     editButton.innerText = "Opslaan";
     editButton.setAttribute("onclick", `saveSample('${docId}')`);
+
+    let cancelButton = document.createElement("button");
+    cancelButton.innerText = "Annuleren";
+    cancelButton.setAttribute("onclick", `cancelEdit('${docId}')`);
+    cancelButton.id = `cancel-btn-${docId}`;
+    sampleElement.appendChild(cancelButton);
 };
 
 // 🔹 Functie om wijzigingen op te slaan
@@ -302,50 +304,24 @@ window.saveSample = function (docId) {
     let sampleElement = document.getElementById(`sample-${docId}`);
     let editButton = document.getElementById(`edit-btn-${docId}`);
 
-    let updatedData = {};
+    let updatedData = {
+        name: sampleElement.querySelector(".sample-name input").value.trim(),
+        size: sampleElement.querySelector(".sample-size input").value.trim(),
+        value: parseFloat(sampleElement.querySelector(".sample-value input").value.trim()),
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    };
 
-    let fields = [
-        { class: "sample-name", key: "name" },
-        { class: "sample-age", key: "age" },
-        { class: "sample-type", key: "type" },
-        { class: "sample-size", key: "size" },
-        { class: "sample-value", key: "value" },
-        { class: "sample-cask", key: "cask" },
-        { class: "sample-notes", key: "notes" },
-        { class: "sample-whiskybase", key: "whiskyBaseLink" }
-    ];
-
-    fields.forEach(field => {
-        let inputElement = sampleElement.querySelector(`.${field.class} input`);
+    let optionalFields = ["age", "type", "cask", "notes", "whiskyBase"];
+    optionalFields.forEach(field => {
+        let inputElement = sampleElement.querySelector(`.sample-${field} input`);
         if (inputElement) {
             let value = inputElement.value.trim();
-            if (field.key === "value") value = parseFloat(value);
-            if (value) updatedData[field.key] = value;
+            if (value) {
+                updatedData[field] = field === "whiskyBase" ? value : value; // Zorg dat whiskybase correct blijft werken
+            }
         }
     });
 
-    if (!updatedData.name || !updatedData.size || !updatedData.value) {
-        alert("⚠️ Naam, grootte en waarde zijn verplicht!");
-        return;
-    }
-
-    // ✅ Update Firestore
-    db.collection("samples").doc(docId).update(updatedData)
-        .then(() => {
-            alert("✅ Sample bijgewerkt!");
-            loadSamples(); // Herlaad de lijst om de wijzigingen te tonen
-        })
-        .catch(error => {
-            console.error("❌ Fout bij bijwerken:", error);
-            alert("❌ Er ging iets mis bij het opslaan.");
-        });
-
-    // ✅ Zet opslaanknop terug naar bewerkknop
-    editButton.innerText = "Bewerken";
-    editButton.setAttribute("onclick", `enableEditMode('${docId}')`);
-};
-
-    // Update Firestore
     db.collection("samples").doc(docId).update(updatedData)
         .then(() => {
             alert("✅ Sample bijgewerkt!");
@@ -356,9 +332,17 @@ window.saveSample = function (docId) {
             alert("❌ Er ging iets mis bij het opslaan.");
         });
 
-    // Zet opslaanknop terug naar bewerkknop
+    // Bewerk- en verwijderknoppen blijven zichtbaar
     editButton.innerText = "Bewerken";
     editButton.setAttribute("onclick", `enableEditMode('${docId}')`);
+
+    let cancelButton = document.getElementById(`cancel-btn-${docId}`);
+    if (cancelButton) cancelButton.remove();
 };
+
+window.cancelEdit = function (docId) {
+    loadSamples(); // Herlaad de samples om de originele weergave terug te zetten
+};
+
 
 console.log("Script is volledig geladen!");
