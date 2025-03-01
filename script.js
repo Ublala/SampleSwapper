@@ -243,9 +243,10 @@ window.loadSamples = function (user) {
             sampleHTML += `</div>`;
             document.getElementById("sampleList").innerHTML += sampleHTML;
         });
+    }).catch(error => {
+        console.error("❌ Fout bij laden van samples:", error);
     });
 };
-
 
 // 🔹 Sample Verwijderen uit Database
 window.deleteSample = function (id) {
@@ -262,7 +263,6 @@ window.enableEditMode = function (docId) {
     let sampleElement = document.getElementById(`sample-${docId}`);
     let editButton = document.getElementById(`edit-btn-${docId}`);
 
-    // Haal alle velden op
     let fields = {
         name: sampleElement.querySelector(".sample-name"),
         age: sampleElement.querySelector(".sample-age"),
@@ -274,21 +274,20 @@ window.enableEditMode = function (docId) {
         whiskyBase: sampleElement.querySelector(".sample-whiskybase")
     };
 
-    // Converteer velden naar invoervelden
     Object.keys(fields).forEach(key => {
         if (fields[key]) {
             let currentValue = fields[key].innerText || "";
             if (key === "value") {
-                currentValue = currentValue.replace("€", "").trim(); // Verwijder euroteken
+                currentValue = currentValue.replace("€", "").trim();
             }
             if (key === "whiskyBase") {
-                currentValue = fields[key].getAttribute("href") || ""; // Zorg ervoor dat de link behouden blijft
+                currentValue = fields[key].getAttribute("href") || "";
             }
             fields[key].innerHTML = `<input type="text" value="${currentValue}" class="edit-input">`;
         }
     });
 
-    // Vervang de bewerkknop door een opslaanknop en een annuleerknop
+    // Vervang bewerkknop door opslaanknop + annuleerknop
     editButton.innerText = "Opslaan";
     editButton.setAttribute("onclick", `saveSample('${docId}')`);
 
@@ -317,7 +316,7 @@ window.saveSample = function (docId) {
         if (inputElement) {
             let value = inputElement.value.trim();
             if (value) {
-                updatedData[field] = field === "whiskyBase" ? value : value; // Zorg dat whiskybase correct blijft werken
+                updatedData[field] = field === "whiskyBase" ? value : value; 
             }
         }
     });
