@@ -74,12 +74,12 @@ window.loadSamples = function (user) {
 
             let sampleHTML = `<div id="sample-${doc.id}" class="sample-card">`;
             sampleHTML += `<h3 class="sample-name">${sample.name}</h3>`;
-            sampleHTML += sample.age ? `<p><strong>Leeftijd:</strong> <span class="sample-age">${sample.age.toUpperCase() === "NAS" ? "NAS" : `${sample.age} years`}</span></p>` : "";
-            sampleHTML += sample.type ? `<p><strong>Type:</strong> <span class="sample-type">${sample.type}</span></p>` : "";
+            sampleHTML += sample.age ? `<p><strong>Leeftijd:</strong> <span class="sample-age">${sample.age === "NAS" ? "NAS" : `${sample.age} years`}</span></p>` : "<p><strong>Leeftijd:</strong> <span class='sample-age'></span></p>";
+            sampleHTML += sample.type ? `<p><strong>Type:</strong> <span class="sample-type">${sample.type}</span></p>` : "<p><strong>Type:</strong> <span class='sample-type'></span></p>";
             sampleHTML += `<p><strong>Grootte:</strong> <span class="sample-size">${sample.size}</span> cl</p>`;
             sampleHTML += `<p><strong>Waarde:</strong> €&nbsp;<span class="sample-value">${parseFloat(sample.value).toFixed(2)}</span></p>`;
-            sampleHTML += sample.cask ? `<p><strong>Cask:</strong> <span class="sample-cask">${sample.cask}</span></p>` : "";
-            sampleHTML += sample.notes ? `<p><strong>Opmerkingen:</strong> <span class="sample-notes">${sample.notes}</span></p>` : "";
+            sampleHTML += sample.cask ? `<p><strong>Cask:</strong> <span class="sample-cask">${sample.cask}</span></p>` : "<p><strong>Cask:</strong> <span class='sample-cask'></span></p>";
+            sampleHTML += sample.notes ? `<p><strong>Opmerkingen:</strong> <span class="sample-notes">${sample.notes}</span></p>` : "<p><strong>Opmerkingen:</strong> <span class='sample-notes'></span></p>";
 
             // ✅ Correcte weergave van de Whiskybase-link
             if (sample.whiskyBaseLink) {
@@ -109,21 +109,23 @@ window.enableEditMode = function (docId) {
     let fields = ["name", "age", "type", "size", "value", "cask", "notes", "whiskyBase"];
     fields.forEach(field => {
         let fieldElement = sampleElement.querySelector(`.sample-${field}`);
-        if (fieldElement) {
-            let value = fieldElement.innerText || "";
-            if (field === "whiskyBase") {
-                let linkElement = fieldElement.querySelector("a");
-                value = linkElement ? linkElement.getAttribute("href") : "";
-            }
-            fieldElement.innerHTML = `<input type="text" value="${value}" class="edit-input">`;
-        } else {
-            // ✅ Toon lege velden zodat ze alsnog ingevuld kunnen worden
-            sampleElement.innerHTML += `<p><strong>${field}:</strong> <input type="text" class="edit-input"></p>`;
+        let value = fieldElement ? fieldElement.innerText.trim() : "";
+
+        if (field === "whiskyBase") {
+            let linkElement = fieldElement.querySelector("a");
+            value = linkElement ? linkElement.getAttribute("href") : "";
         }
+
+        fieldElement.innerHTML = `<input type="text" value="${value}" class="edit-input">`;
     });
 
     editButton.innerText = "Opslaan";
     editButton.setAttribute("onclick", `saveSample('${docId}')`);
+
+    let cancelButton = document.createElement("button");
+    cancelButton.innerText = "Annuleren";
+    cancelButton.setAttribute("onclick", `loadSamples()`);
+    sampleElement.appendChild(cancelButton);
 };
 
 // 🔹 Wijzigingen opslaan
