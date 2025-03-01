@@ -46,9 +46,22 @@ window.login = function () {
         });
 };
 
+// 🔹 Controleer of een gebruiker is ingelogd en pas UI aan
+window.checkUser = function () {
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            document.getElementById("userStatus").innerText = `✅ Ingelogd als: ${user.email}`;
+            loadSamples(user);
+        } else {
+            document.getElementById("userStatus").innerText = "❌ Niet ingelogd";
+            loadSamples(null);
+        }
+    });
+};
+
 // 🔹 Automatisch controleren of gebruiker ingelogd is bij opstarten
 window.onload = () => {
-    checkUser();
+    checkUser(); // Roep de functie aan zodat de UI direct wordt aangepast
 };
 
 // 🔹 Samples ophalen en weergeven
