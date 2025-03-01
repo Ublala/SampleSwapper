@@ -32,7 +32,23 @@ window.onload = () => {
     });
 };
 
-// 🔹 Samples Ophalen uit Database en Weergeven
+// 🔹 Gebruiker Inloggen (FIXED)
+window.login = function () {
+    let email = document.getElementById("email").value;
+    let password = document.getElementById("password").value;
+
+    auth.signInWithEmailAndPassword(email, password)
+        .then(() => {
+            alert("✅ Inloggen succesvol!");
+            loadSamples(auth.currentUser);
+        })
+        .catch(error => {
+            console.error("❌ Fout bij inloggen:", error);
+            alert("❌ Fout: " + error.message);
+        });
+};
+
+// 🔹 Samples Ophalen uit Database en Weergeven (FIXED)
 window.loadSamples = function (user) {
     document.getElementById("sampleList").innerHTML = "";
 
@@ -49,8 +65,8 @@ window.loadSamples = function (user) {
             sampleHTML += `<p><strong>Waarde:</strong> €&nbsp;<span class="sample-value">${parseFloat(sample.value).toFixed(2)}</span></p>`;
             sampleHTML += sample.cask ? `<p><strong>Cask:</strong> <span class="sample-cask">${sample.cask}</span></p>` : "";
             sampleHTML += sample.notes ? `<p><strong>Opmerkingen:</strong> <span class="sample-notes">${sample.notes}</span></p>` : "";
-            
-            // 🔹 Correcte Whiskybase weergave
+
+            // 🔹 Correcte Whiskybase weergave (FIXED)
             if (sample.whiskyBaseLink) {
                 sampleHTML += `<p><strong>Whiskybase:</strong> <a class="sample-whiskybase" href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer">Whiskybase</a></p>`;
             }
@@ -70,82 +86,11 @@ window.loadSamples = function (user) {
     });
 };
 
-// 🔹 Voeg inline bewerkingsfunctionaliteit toe aan sample cards
-window.enableEditMode = function (docId) {
-    let sampleElement = document.getElementById(`sample-${docId}`);
-    let editButton = document.getElementById(`edit-btn-${docId}`);
-
-    let fields = ["name", "age", "type", "size", "value", "cask", "notes", "whiskyBase"];
-    fields.forEach(field => {
-        let fieldElement = sampleElement.querySelector(`.sample-${field}`);
-        if (fieldElement) {
-            let value = fieldElement.innerText || "";
-            if (field === "whiskyBase") {
-                let linkElement = fieldElement.querySelector("a");
-                value = linkElement ? linkElement.getAttribute("href") : "";
-            }
-            fieldElement.innerHTML = `<input type="text" value="${value}" class="edit-input">`;
-
-            if (field === "notes") {
-                let textarea = document.createElement("textarea");
-                textarea.classList.add("edit-input");
-                textarea.value = value;
-                textarea.oninput = function () { autoResize(this); };
-                fieldElement.innerHTML = "";
-                fieldElement.appendChild(textarea);
-                autoResize(textarea);
-            }
-        }
-    });
-
-    // Vervang bewerkknop door opslaanknop + annuleerknop
-    editButton.innerText = "Opslaan";
-    editButton.setAttribute("onclick", `saveSample('${docId}')`);
-
-    let cancelButton = document.createElement("button");
-    cancelButton.innerText = "Annuleren";
-    cancelButton.setAttribute("onclick", `cancelEdit('${docId}')`);
-    cancelButton.id = `cancel-btn-${docId}`;
-    sampleElement.appendChild(cancelButton);
-};
-
-// 🔹 Functie om wijzigingen op te slaan
-window.saveSample = function (docId) {
-    let sampleElement = document.getElementById(`sample-${docId}`);
-    let updatedData = {
-        name: sampleElement.querySelector(".sample-name input").value.trim(),
-        size: sampleElement.querySelector(".sample-size input").value.trim(),
-        value: parseFloat(sampleElement.querySelector(".sample-value input").value.trim()),
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    };
-
-    let optionalFields = ["age", "type", "cask", "notes", "whiskyBase"];
-    optionalFields.forEach(field => {
-        let inputElement = sampleElement.querySelector(`.sample-${field} input, .sample-${field} textarea`);
-        if (inputElement) {
-            let value = inputElement.value.trim();
-            if (value) {
-                updatedData[field] = value;
-            }
-        }
-    });
-
-    db.collection("samples").doc(docId).update(updatedData)
-        .then(() => {
-            alert("✅ Sample bijgewerkt!");
-            loadSamples();
-        })
-        .catch(error => {
-            console.error("❌ Fout bij bijwerken:", error);
-            alert("❌ Er ging iets mis bij het opslaan.");
-        });
-};
-
-// 🔹 Sample Verwijderen uit Database
+// 🔹 Sample Verwijderen uit Database (FIXED)
 window.deleteSample = function (id) {
     db.collection("samples").doc(id).delete().then(() => {
         alert("✅ Sample verwijderd!");
-        loadSamples();
+        loadSamples(); // Laad direct opnieuw zodat knoppen blijven werken
     }).catch(error => {
         console.error("❌ Fout bij verwijderen: ", error);
     });
