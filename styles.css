@@ -28,6 +28,7 @@ input, textarea {
     width: 80%;
     max-width: 350px;
     font-size: 16px;
+    font-family: inherit;
     border: 1px solid #ddd;
     border-radius: 8px;
     box-sizing: border-box;
@@ -120,4 +121,96 @@ button:active {
 }
 
 .sample-card p {
-    margin:
+    margin: 10px 0;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.sample-card p:last-of-type {
+    border-bottom: none;
+    margin-bottom: 15px;
+}
+
+.sample-card strong {
+    color: #555;
+    font-weight: 600;
+    margin-right: 5px;
+    min-width: 80px;
+    display: inline-block;
+}
+
+.sample-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.sample-card a {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.sample-card a:hover {
+    color: #2980b9;
+    text-decoration: underline;
+}
+
+textarea {
+    min-height: 80px;
+    resize: none;
+    overflow-y: hidden;
+    line-height: 1.5;
+    font-family: inherit;
+}
+
+.edit-input {
+    width: 100%;
+    padding: 8px;
+    font-size: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin: 0;
+    display: block;
+    font-family: inherit;
+}
+
+textarea.edit-input {
+    min-height: 60px;
+    resize: none;
+    overflow-y: hidden;
+}
+
+#sample-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Specifieke styling voor de knoppen */
+#save-btn-${docId} {
+    background-color: #2ecc71;
+}
+
+#save-btn-${docId}:hover {
+    background-color: #27ae60;
+}
+
+#cancel-btn-${docId} {
+    background-color: #95a5a6;
+}
+
+#cancel-btn-${docId}:hover {
+    background-color: #7f8c8d;
+}
+
+#delete-btn-${docId} {
+    background-color: #e74c3c;
+}
+
+#delete-btn-${docId}:hover {
+    background-color: #c0392b;
+}
