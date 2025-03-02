@@ -10,44 +10,45 @@
     <h1>SampleSwapper</h1>
 
     <!-- Gebruikersregistratie & Inloggen -->
-<div id="authSection">
-    <h2>Login of Registreer</h2>
-    <input type="email" id="email" placeholder="E-mail">
-    <input type="password" id="password" placeholder="Wachtwoord">
-    <button onclick="register()">Registreer</button>
-    <button onclick="login()">Login</button>
-    <button onclick="resetPassword()">Wachtwoord Vergeten?</button>
-</div>
+    <div id="authSection">
+        <h2>Login of Registreer</h2>
+        <input type="email" id="email" placeholder="E-mail">
+        <input type="password" id="password" placeholder="Wachtwoord">
+        <button onclick="register()">Registreer</button>
+        <button onclick="login()">Login</button>
+        <button onclick="resetPassword()">Wachtwoord Vergeten?</button>
+    </div>
 
-<!-- Uitlogknop apart van het registratieformulier -->
-<button id="logoutButton" onclick="logout()" style="display: none;">Uitloggen</button>
+    <!-- Uitlogknop apart van het registratieformulier -->
+    <button id="logoutButton" onclick="logout()" style="display: none;">Uitloggen</button>
 
-<p id="userStatus">Niet ingelogd</p>
+    <p id="userStatus">Niet ingelogd</p>
 
     <!-- Formulier om een sample toe te voegen -->
-<div id="addSampleForm">
-    <input type="text" id="whiskyName" placeholder="Whisky" required>
-    <input type="text" id="whiskyType" placeholder="Type">
-    <input type="text" id="whiskyAge" placeholder="Leeftijd">
-    <input type="text" id="whiskyCask" placeholder="Cask">
-    <input type="number" id="whiskySize" placeholder="Grootte van het sample (cl)">
-    <input type="text" id="whiskyValue" placeholder="Prijs (bijv. €10)" required>
-    <input type="url" id="whiskyBaseLink" placeholder="Link naar Whiskybase">
-    <textarea id="whiskyNotes" placeholder="Opmerkingen of beschrijving" oninput="autoResize(this)"></textarea>
-    <button onclick="addSample()">Voeg Sample Toe</button>
-</div>
+    <div id="addSampleForm" style="display: none;">
+        <h2>Voeg Nieuwe Sample Toe</h2>
+        <input type="text" id="whiskyName" placeholder="Whisky" required>
+        <input type="text" id="whiskyType" placeholder="Type">
+        <input type="text" id="whiskyAge" placeholder="Leeftijd">
+        <input type="text" id="whiskyCask" placeholder="Cask">
+        <input type="number" id="whiskySize" placeholder="Grootte van het sample (cl)" min="1" required>
+        <input type="text" id="whiskyValue" placeholder="Prijs (bijv. 10)" required>
+        <input type="url" id="whiskyBaseLink" placeholder="Link naar Whiskybase">
+        <textarea id="whiskyNotes" placeholder="Opmerkingen of beschrijving" oninput="autoResize(this)"></textarea>
+        <button onclick="addSample()">Voeg Sample Toe</button>
+    </div>
 
-    <h2>Beschikbare Samples</h2>
-    <div id="sampleList"></div>
+    <div id="samplesContainer" style="display: none;">
+        <h2>Beschikbare Samples</h2>
+        <div id="sampleList"></div>
+    </div>
 
-     <!-- Firebase SDK (Correcte versie 8.10.0 gebruiken) -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script> <!-- 🔹 BELANGRIJK: Zorg dat deze aanwezig is -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
-<!-- Laad je script.js ALS LAATSTE (na Firebase) -->
-<script defer src="script.js"></script>
-
-
+    <!-- Laad je script.js ALS LAATSTE (na Firebase) -->
+    <script defer src="script.js"></script>
 </body>
 </html>
