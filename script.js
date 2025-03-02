@@ -20,14 +20,17 @@ function checkUser() {
         currentUser = user;
         const logoutButton = document.getElementById("logoutButton");
         const userStatus = document.getElementById("userStatus");
+        const addSampleForm = document.getElementById("addSampleForm");
         
         if (user) {
             userStatus.innerText = `✅ Ingelogd als: ${user.email}`;
             logoutButton.style.display = "block";
+            addSampleForm.style.display = "block";
             loadSamples(user);
         } else {
             userStatus.innerText = "❌ Niet ingelogd";
             logoutButton.style.display = "none";
+            addSampleForm.style.display = "none";
             document.getElementById("sampleList").innerHTML = "";
         }
     });
@@ -128,6 +131,7 @@ function loadSamples(user) {
                 const sample = doc.data();
                 const isOwner = sample.userId === user.uid;
                 
+                // Aangepaste volgorde van velden zoals verzocht
                 let sampleHTML = `<div id="sample-${doc.id}" class="sample-card">`;
                 sampleHTML += `<p><strong>Whisky:</strong> <span class="sample-name">${sample.name || ""}</span></p>`;
                 
@@ -140,9 +144,9 @@ function loadSamples(user) {
                 }
                 
                 sampleHTML += `<p><strong>Type:</strong> <span class="sample-type">${sample.type || ""}</span></p>`;
+                sampleHTML += `<p><strong>Cask:</strong> <span class="sample-cask">${sample.cask || ""}</span></p>`;
                 sampleHTML += `<p><strong>Grootte:</strong> <span class="sample-size">${sample.size || ""}</span> cl</p>`;
                 sampleHTML += `<p><strong>Waarde:</strong> €&nbsp;<span class="sample-value">${parseFloat(sample.value || 0).toFixed(2)}</span></p>`;
-                sampleHTML += `<p><strong>Cask:</strong> <span class="sample-cask">${sample.cask || ""}</span></p>`;
                 sampleHTML += `<p><strong>Opmerkingen:</strong> <span class="sample-notes">${sample.notes || ""}</span></p>`;
                 
                 // Correcte weergave van de Whiskybase-link
@@ -153,6 +157,7 @@ function loadSamples(user) {
                 }
                 
                 // Bewerkingsknoppen alleen tonen voor de eigenaar
+                // Gewijzigde volgorde van knoppen zoals verzocht: Bewerken, Verwijderen
                 if (isOwner) {
                     sampleHTML += `
                         <div class="sample-buttons">
@@ -191,13 +196,13 @@ function addSample() {
     // Verzamel alle gegevens voor de nieuwe sample
     const sampleData = {
         name: whiskyName,
-        type: document.getElementById("whiskyType").value.trim(),
         age: document.getElementById("whiskyAge").value.trim(),
+        type: document.getElementById("whiskyType").value.trim(),
         cask: document.getElementById("whiskyCask").value.trim(),
         size: whiskySize,
         value: parseFloat(whiskyValue),
-        whiskyBaseLink: document.getElementById("whiskyBaseLink").value.trim(),
         notes: document.getElementById("whiskyNotes").value.trim(),
+        whiskyBaseLink: document.getElementById("whiskyBaseLink").value.trim(),
         userId: currentUser.uid,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
     };
@@ -209,13 +214,13 @@ function addSample() {
             
             // Reset formuliervelden
             document.getElementById("whiskyName").value = "";
-            document.getElementById("whiskyType").value = "";
             document.getElementById("whiskyAge").value = "";
+            document.getElementById("whiskyType").value = "";
             document.getElementById("whiskyCask").value = "";
             document.getElementById("whiskySize").value = "";
             document.getElementById("whiskyValue").value = "";
-            document.getElementById("whiskyBaseLink").value = "";
             document.getElementById("whiskyNotes").value = "";
+            document.getElementById("whiskyBaseLink").value = "";
             
             // Laad samples opnieuw
             loadSamples(currentUser);
@@ -235,9 +240,9 @@ function enableEditMode(docId) {
     const nameElement = sampleElement.querySelector(".sample-name");
     const ageElement = sampleElement.querySelector(".sample-age");
     const typeElement = sampleElement.querySelector(".sample-type");
+    const caskElement = sampleElement.querySelector(".sample-cask");
     const sizeElement = sampleElement.querySelector(".sample-size");
     const valueElement = sampleElement.querySelector(".sample-value");
-    const caskElement = sampleElement.querySelector(".sample-cask");
     const notesElement = sampleElement.querySelector(".sample-notes");
     const whiskyBaseLinkElement = sampleElement.querySelector(".sample-whiskyBaseLink");
     
@@ -245,9 +250,9 @@ function enableEditMode(docId) {
     const name = nameElement.innerText.trim();
     const age = ageElement.innerText.replace(/\s*years\s*/gi, "").trim();
     const type = typeElement.innerText.trim();
+    const cask = caskElement.innerText.trim();
     const size = sizeElement.innerText.trim();
     const value = valueElement.innerText.trim();
-    const cask = caskElement.innerText.trim();
     const notes = notesElement.innerText.trim();
     
     // Haal Whiskybase link op (als die er is)
@@ -262,26 +267,36 @@ function enableEditMode(docId) {
     nameElement.innerHTML = `<input type="text" value="${name}" class="edit-input">`;
     ageElement.innerHTML = `<input type="text" value="${age}" class="edit-input">`;
     typeElement.innerHTML = `<input type="text" value="${type}" class="edit-input">`;
+    caskElement.innerHTML = `<input type="text" value="${cask}" class="edit-input">`;
     sizeElement.innerHTML = `<input type="number" value="${size}" class="edit-input" min="1">`;
     valueElement.innerHTML = `<input type="text" value="${value}" class="edit-input">`;
-    caskElement.innerHTML = `<input type="text" value="${cask}" class="edit-input">`;
     notesElement.innerHTML = `<textarea class="edit-input" oninput="autoResize(this)">${notes}</textarea>`;
-    
-    // Hulpfunctie om de Whiskybase link te bewerken - zelfs als er geen was
     whiskyBaseLinkElement.innerHTML = `<input type="url" value="${whiskyBaseLink}" class="edit-input" placeholder="Link naar Whiskybase">`;
     
-    // Verander de knoppen
-    editButton.innerText = "Opslaan";
-    editButton.setAttribute("onclick", `saveSample('${docId}')`);
+    // Verander de knoppen en maak buttons met de juiste volgorde: Opslaan, Annuleren, Verwijderen
+    const buttonsContainer = sampleElement.querySelector(".sample-buttons");
     
-    // Voeg een annuleerknop toe als deze er nog niet is
-    if (!document.getElementById(`cancel-btn-${docId}`)) {
-        const cancelButton = document.createElement("button");
-        cancelButton.innerText = "Annuleren";
-        cancelButton.setAttribute("onclick", `cancelEdit('${docId}')`);
-        cancelButton.id = `cancel-btn-${docId}`;
-        sampleElement.querySelector(".sample-buttons").appendChild(cancelButton);
-    }
+    // Verwijder bestaande knoppen
+    buttonsContainer.innerHTML = "";
+    
+    // Voeg nieuwe knoppen toe in de gewenste volgorde
+    const saveButton = document.createElement("button");
+    saveButton.innerText = "Opslaan";
+    saveButton.setAttribute("onclick", `saveSample('${docId}')`);
+    saveButton.id = `save-btn-${docId}`;
+    buttonsContainer.appendChild(saveButton);
+    
+    const cancelButton = document.createElement("button");
+    cancelButton.innerText = "Annuleren";
+    cancelButton.setAttribute("onclick", `cancelEdit('${docId}')`);
+    cancelButton.id = `cancel-btn-${docId}`;
+    buttonsContainer.appendChild(cancelButton);
+    
+    const deleteButton = document.createElement("button");
+    deleteButton.innerText = "Verwijderen";
+    deleteButton.setAttribute("onclick", `deleteSample('${docId}')`);
+    deleteButton.id = `delete-btn-${docId}`;
+    buttonsContainer.appendChild(deleteButton);
     
     // Auto-resize voor de textarea
     autoResize(sampleElement.querySelector("textarea"));
@@ -301,9 +316,9 @@ function saveSample(docId) {
     const name = sampleElement.querySelector(".sample-name input").value.trim();
     const age = sampleElement.querySelector(".sample-age input").value.trim();
     const type = sampleElement.querySelector(".sample-type input").value.trim();
+    const cask = sampleElement.querySelector(".sample-cask input").value.trim();
     const size = sampleElement.querySelector(".sample-size input").value.trim();
     const value = sampleElement.querySelector(".sample-value input").value.trim();
-    const cask = sampleElement.querySelector(".sample-cask input").value.trim();
     const notes = sampleElement.querySelector(".sample-notes textarea").value.trim();
     const whiskyBaseLink = sampleElement.querySelector(".sample-whiskyBaseLink input").value.trim();
     
