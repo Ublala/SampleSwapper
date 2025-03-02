@@ -18,22 +18,16 @@ let currentUser = null;
 function checkUser() {
     auth.onAuthStateChanged(user => {
         currentUser = user;
-        const addSampleForm = document.getElementById("addSampleForm");
-        const samplesContainer = document.getElementById("samplesContainer");
-        const userStatus = document.getElementById("userStatus");
         const logoutButton = document.getElementById("logoutButton");
+        const userStatus = document.getElementById("userStatus");
         
         if (user) {
             userStatus.innerText = `✅ Ingelogd als: ${user.email}`;
             logoutButton.style.display = "block";
-            addSampleForm.style.display = "block";
-            samplesContainer.style.display = "block";
-            loadSamples();
+            loadSamples(user);
         } else {
             userStatus.innerText = "❌ Niet ingelogd";
             logoutButton.style.display = "none";
-            addSampleForm.style.display = "none";
-            samplesContainer.style.display = "none";
             document.getElementById("sampleList").innerHTML = "";
         }
     });
@@ -115,8 +109,8 @@ function logout() {
 }
 
 // 🔹 Samples ophalen en weergeven
-function loadSamples() {
-    if (!currentUser) return;
+function loadSamples(user) {
+    if (!user) return;
     
     const sampleList = document.getElementById("sampleList");
     sampleList.innerHTML = ""; // Voorkomt dubbele kaarten
@@ -132,7 +126,7 @@ function loadSamples() {
             
             snapshot.forEach(doc => {
                 const sample = doc.data();
-                const isOwner = sample.userId === currentUser.uid;
+                const isOwner = sample.userId === user.uid;
                 
                 let sampleHTML = `<div id="sample-${doc.id}" class="sample-card">`;
                 sampleHTML += `<p><strong>Whisky:</strong> <span class="sample-name">${sample.name || ""}</span></p>`;
@@ -224,7 +218,7 @@ function addSample() {
             document.getElementById("whiskyNotes").value = "";
             
             // Laad samples opnieuw
-            loadSamples();
+            loadSamples(currentUser);
         })
         .catch(error => {
             console.error("❌ Fout bij toevoegen van sample:", error);
@@ -296,7 +290,7 @@ function enableEditMode(docId) {
 // 🔹 Annuleren van bewerkingsmodus
 function cancelEdit(docId) {
     // We laden gewoon alles opnieuw
-    loadSamples();
+    loadSamples(currentUser);
 }
 
 // 🔹 Sample opslaan na bewerking
@@ -338,7 +332,7 @@ function saveSample(docId) {
     db.collection("samples").doc(docId).update(updatedData)
         .then(() => {
             alert("✅ Sample bijgewerkt!");
-            loadSamples();
+            loadSamples(currentUser);
         })
         .catch(error => {
             console.error("❌ Fout bij bijwerken:", error);
@@ -352,7 +346,7 @@ function deleteSample(docId) {
         db.collection("samples").doc(docId).delete()
             .then(() => {
                 alert("✅ Sample verwijderd!");
-                loadSamples();
+                loadSamples(currentUser);
             })
             .catch(error => {
                 console.error("❌ Fout bij verwijderen: ", error);
