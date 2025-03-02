@@ -1,129 +1,165 @@
 body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
     text-align: center;
-    background-color: #f5f5f5;
+    background-color: #f8f8f8;
     color: #333;
     line-height: 1.6;
 }
 
 h1 {
-    color: #ff9900;
+    color: #e67e22;
     margin-bottom: 20px;
+    font-size: 2.5rem;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
 }
 
 h2 {
-    color: #666;
-    margin: 20px 0 10px;
+    color: #555;
+    margin: 20px 0 15px;
+    font-size: 1.8rem;
 }
 
 input, textarea {
     display: block;
-    margin: 10px auto;
-    padding: 10px;
+    margin: 12px auto;
+    padding: 12px;
     width: 80%;
-    max-width: 300px;
+    max-width: 350px;
     font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
     box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    background-color: white;
 }
 
 input:focus, textarea:focus {
-    border-color: #ff9900;
+    border-color: #e67e22;
     outline: none;
-    box-shadow: 0 0 5px rgba(255, 153, 0, 0.3);
+    box-shadow: 0 0 8px rgba(230, 126, 34, 0.4);
 }
 
 button {
     display: inline-block;
     width: auto;
     padding: 10px 20px;
-    background-color: #ff9900;
+    background-color: #e67e22;
     border: none;
     color: white;
     cursor: pointer;
     text-align: center;
-    border-radius: 5px;
+    border-radius: 8px;
     font-size: 16px;
     margin: 10px 5px;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 button:hover {
-    background-color: #cc7a00;
+    background-color: #d35400;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+button:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 
 #logoutButton {
     position: absolute;
     top: 20px;
     right: 20px;
-    background-color: #999;
+    background-color: #7f8c8d;
 }
 
 #logoutButton:hover {
-    background-color: #777;
+    background-color: #636e72;
 }
 
 #userStatus {
     margin: 20px 0;
     font-weight: bold;
+    background-color: #f1f1f1;
+    display: inline-block;
+    padding: 8px 15px;
+    border-radius: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 #addSampleForm {
     background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin: 20px auto;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    margin: 25px auto;
     max-width: 500px;
+    border: 1px solid #eaeaea;
 }
 
 .sample-card {
     background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 15px;
-    margin: 15px auto;
+    border: 1px solid #eaeaea;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px auto;
     width: 80%;
-    max-width: 400px;
+    max-width: 450px;
     text-align: left;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
 }
 
 .sample-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.12);
 }
 
 .sample-card p {
-    margin: 8px 0;
+    margin: 10px 0;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.sample-card p:last-of-type {
+    border-bottom: none;
+    margin-bottom: 15px;
 }
 
 .sample-card strong {
-    color: #666;
+    color: #555;
+    font-weight: 600;
+    margin-right: 5px;
+    min-width: 80px;
+    display: inline-block;
 }
 
 .sample-buttons {
-    margin-top: 15px;
+    margin-top: 20px;
     display: flex;
     justify-content: flex-start;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
 .sample-card a {
-    color: #ff9900;
+    color: #3498db;
     text-decoration: none;
-    font-weight: bold;
+    font-weight: 600;
+    transition: color 0.2s;
 }
 
 .sample-card a:hover {
+    color: #2980b9;
     text-decoration: underline;
 }
 
 textarea {
-    min-height: 60px;
+    min-height: 80px;
     resize: none;
     overflow-y: hidden;
     line-height: 1.5;
@@ -132,13 +168,45 @@ textarea {
 
 .edit-input {
     width: 100%;
-    padding: 5px;
-    font-size: 14px;
+    padding: 8px;
+    font-size: 15px;
     border: 1px solid #ddd;
-    border-radius: 3px;
+    border-radius: 5px;
     margin: 0;
+    display: block;
 }
 
-#samplesContainer {
-    margin-top: 30px;
+textarea.edit-input {
+    min-height: 60px;
+}
+
+#sample-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Toevoegen van stijlen voor de knoppen in de juiste volgorde */
+#save-btn {
+    background-color: #2ecc71;
+}
+
+#save-btn:hover {
+    background-color: #27ae60;
+}
+
+#cancel-btn {
+    background-color: #95a5a6;
+}
+
+#cancel-btn:hover {
+    background-color: #7f8c8d;
+}
+
+#delete-btn {
+    background-color: #e74c3c;
+}
+
+#delete-btn:hover {
+    background-color: #c0392b;
 }
