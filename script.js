@@ -293,18 +293,6 @@ function enableEditMode(docId) {
     const sampleElement = document.getElementById(`sample-${docId}`);
     const editButton = document.getElementById(`edit-btn-${docId}`);
     
-    // Voorkom dat links worden geopend tijdens het bewerken
-    // Verwijder eerst alle bestaande links in het element
-    const links = sampleElement.querySelectorAll('a');
-    links.forEach(link => {
-        const linkUrl = link.getAttribute('href');
-        const linkText = link.textContent;
-        const span = document.createElement('span');
-        span.textContent = linkText;
-        span.dataset.url = linkUrl;
-        link.parentNode.replaceChild(span, link);
-    });
-    
     // Haal alle elementen op die we willen bewerken
     const nameElement = sampleElement.querySelector(".sample-name");
     const ageElement = sampleElement.querySelector(".sample-age");
@@ -343,6 +331,14 @@ function enableEditMode(docId) {
     
     // Hulpfunctie om de Whiskybase link te bewerken - als platte tekst
     whiskyBaseLinkElement.innerHTML = `<span>Link naar Whiskybase:</span> <input type="url" value="${whiskyBaseLink}" class="edit-input" placeholder="Link naar Whiskybase">`;
+    
+    // Voorkom dat links worden geopend tijdens het bewerken
+    const links = sampleElement.querySelectorAll('a');
+    links.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+        });
+    });
     
     // Verander de knoppen en maak buttons met de juiste volgorde: Opslaan, Annuleren, Verwijderen
     const buttonsContainer = sampleElement.querySelector(".sample-buttons");
