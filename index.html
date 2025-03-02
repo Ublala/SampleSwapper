@@ -26,14 +26,14 @@
 
     <!-- Formulier om een sample toe te voegen -->
     <div id="addSampleForm">
-        <h2>Voeg Nieuwe Sample Toe</h2>
+        <h2>Voeg nieuw sample toe</h2>
         <!-- Aangepaste veldvolgorde zoals verzocht -->
         <input type="text" id="whiskyName" placeholder="Whisky" required>
         <input type="text" id="whiskyAge" placeholder="Leeftijd">
         <input type="text" id="whiskyType" placeholder="Type">
         <input type="text" id="whiskyCask" placeholder="Cask">
         <input type="number" id="whiskySize" placeholder="Grootte van het sample (cl)" min="1" required>
-        <input type="text" id="whiskyValue" placeholder="Prijs (bijv. 10)" required>
+        <input type="text" id="whiskyValue" placeholder="Prijs (€)" required>
         <textarea id="whiskyNotes" placeholder="Opmerkingen of beschrijving" oninput="autoResize(this)"></textarea>
         <input type="url" id="whiskyBaseLink" placeholder="Link naar Whiskybase">
         <button onclick="addSample()">Voeg Sample Toe</button>
