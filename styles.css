@@ -1,6 +1,6 @@
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0;
+    font-family: Arial, sans-serif;
+    margin: 20px;
     padding: 20px;
     text-align: center;
     background-color: #f8f8f8;
@@ -9,7 +9,7 @@ body {
 }
 
 h1 {
-    color: #e67e22;
+    color: #ff9900;
     margin-bottom: 20px;
     font-size: 2.5rem;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
@@ -37,16 +37,16 @@ input, textarea {
 }
 
 input:focus, textarea:focus {
-    border-color: #e67e22;
+    border-color: #ff9900;
     outline: none;
-    box-shadow: 0 0 8px rgba(230, 126, 34, 0.4);
+    box-shadow: 0 0 8px rgba(255, 153, 0, 0.4);
 }
 
 button {
     display: inline-block;
     width: auto;
     padding: 10px 20px;
-    background-color: #e67e22;
+    background-color: #ff9900;
     border: none;
     color: white;
     cursor: pointer;
@@ -60,7 +60,7 @@ button {
 }
 
 button:hover {
-    background-color: #d35400;
+    background-color: #e68a00;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
@@ -74,11 +74,11 @@ button:active {
     position: absolute;
     top: 20px;
     right: 20px;
-    background-color: #7f8c8d;
+    background-color: #999;
 }
 
 #logoutButton:hover {
-    background-color: #636e72;
+    background-color: #777;
 }
 
 #userStatus {
@@ -191,26 +191,26 @@ textarea.edit-input {
 }
 
 /* Specifieke styling voor de knoppen */
-#save-btn-${docId} {
+[id^="save-btn-"] {
     background-color: #2ecc71;
 }
 
-#save-btn-${docId}:hover {
+[id^="save-btn-"]:hover {
     background-color: #27ae60;
 }
 
-#cancel-btn-${docId} {
+[id^="cancel-btn-"] {
     background-color: #95a5a6;
 }
 
-#cancel-btn-${docId}:hover {
+[id^="cancel-btn-"]:hover {
     background-color: #7f8c8d;
 }
 
-#delete-btn-${docId} {
+[id^="delete-btn-"] {
     background-color: #e74c3c;
 }
 
-#delete-btn-${docId}:hover {
+[id^="delete-btn-"]:hover {
     background-color: #c0392b;
 }
