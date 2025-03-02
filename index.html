@@ -25,7 +25,7 @@
     <p id="userStatus">Niet ingelogd</p>
 
     <!-- Formulier om een sample toe te voegen -->
-    <div id="addSampleForm" style="display: none;">
+    <div id="addSampleForm">
         <h2>Voeg Nieuwe Sample Toe</h2>
         <input type="text" id="whiskyName" placeholder="Whisky" required>
         <input type="text" id="whiskyType" placeholder="Type">
@@ -38,10 +38,8 @@
         <button onclick="addSample()">Voeg Sample Toe</button>
     </div>
 
-    <div id="samplesContainer" style="display: none;">
-        <h2>Beschikbare Samples</h2>
-        <div id="sampleList"></div>
-    </div>
+    <h2>Beschikbare Samples</h2>
+    <div id="sampleList"></div>
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
