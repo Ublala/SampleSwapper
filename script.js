@@ -10,152 +10,331 @@ const firebaseConfig = {
 
 // 🔹 Firebase Initialiseren
 firebase.initializeApp(firebaseConfig);
-window.auth = firebase.auth();
-window.db = firebase.firestore();
+const auth = firebase.auth();
+const db = firebase.firestore();
+let currentUser = null;
 
 // 🔹 Controleer of een gebruiker is ingelogd en pas UI aan
-window.checkUser = function () {
+function checkUser() {
     auth.onAuthStateChanged(user => {
+        currentUser = user;
+        const addSampleForm = document.getElementById("addSampleForm");
+        const samplesContainer = document.getElementById("samplesContainer");
+        const userStatus = document.getElementById("userStatus");
+        const logoutButton = document.getElementById("logoutButton");
+        
         if (user) {
-            document.getElementById("userStatus").innerText = `✅ Ingelogd als: ${user.email}`;
-            document.getElementById("logoutButton").style.display = "block";
-            loadSamples(user);
+            userStatus.innerText = `✅ Ingelogd als: ${user.email}`;
+            logoutButton.style.display = "block";
+            addSampleForm.style.display = "block";
+            samplesContainer.style.display = "block";
+            loadSamples();
         } else {
-            document.getElementById("userStatus").innerText = "❌ Niet ingelogd";
-            document.getElementById("logoutButton").style.display = "none";
-            document.getElementById("sampleList").innerHTML = ""; // ✅ Voorkomt dubbele kaarten bij uitloggen
+            userStatus.innerText = "❌ Niet ingelogd";
+            logoutButton.style.display = "none";
+            addSampleForm.style.display = "none";
+            samplesContainer.style.display = "none";
+            document.getElementById("sampleList").innerHTML = "";
         }
     });
-};
+}
+
+// 🔹 Registreren functionaliteit
+function register() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    
+    if (!email || !password) {
+        alert("❌ Vul een geldig e-mailadres en wachtwoord in.");
+        return;
+    }
+    
+    auth.createUserWithEmailAndPassword(email, password)
+        .then(() => {
+            alert("✅ Registratie succesvol! Je bent nu ingelogd.");
+            document.getElementById("email").value = "";
+            document.getElementById("password").value = "";
+        })
+        .catch(error => {
+            console.error("❌ Fout bij registreren:", error);
+            alert("❌ Fout: " + error.message);
+        });
+}
 
 // 🔹 Inloggen functionaliteit
-window.login = function () {
-    let email = document.getElementById("email").value;
-    let password = document.getElementById("password").value;
-
+function login() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    
+    if (!email || !password) {
+        alert("❌ Vul een geldig e-mailadres en wachtwoord in.");
+        return;
+    }
+    
     auth.signInWithEmailAndPassword(email, password)
         .then(() => {
             alert("✅ Inloggen succesvol!");
-            document.getElementById("sampleList").innerHTML = ""; // ✅ Voorkomt dubbele kaarten
-            checkUser();
+            document.getElementById("email").value = "";
+            document.getElementById("password").value = "";
         })
         .catch(error => {
             console.error("❌ Fout bij inloggen:", error);
             alert("❌ Fout: " + error.message);
         });
-};
+}
+
+// 🔹 Wachtwoord reset functionaliteit
+function resetPassword() {
+    const email = document.getElementById("email").value;
+    
+    if (!email) {
+        alert("❌ Vul je e-mailadres in voor het resetten van je wachtwoord.");
+        return;
+    }
+    
+    auth.sendPasswordResetEmail(email)
+        .then(() => {
+            alert("✅ Er is een wachtwoord reset e-mail verzonden naar je e-mailadres.");
+        })
+        .catch(error => {
+            console.error("❌ Fout bij wachtwoord reset:", error);
+            alert("❌ Fout: " + error.message);
+        });
+}
 
 // 🔹 Uitloggen functionaliteit
-window.logout = function () {
-    auth.signOut().then(() => {
-        alert("✅ Uitgelogd!");
-        document.getElementById("sampleList").innerHTML = ""; // ✅ Voorkomt dubbele kaarten bij opnieuw inloggen
-    }).catch(error => {
-        console.error("❌ Fout bij uitloggen:", error);
-    });
-};
-
-// 🔹 Automatisch controleren of gebruiker ingelogd is bij opstarten
-window.onload = () => {
-    checkUser();
-};
+function logout() {
+    auth.signOut()
+        .then(() => {
+            alert("✅ Uitgelogd!");
+        })
+        .catch(error => {
+            console.error("❌ Fout bij uitloggen:", error);
+            alert("❌ Fout: " + error.message);
+        });
+}
 
 // 🔹 Samples ophalen en weergeven
-window.loadSamples = function (user) {
-    let sampleList = document.getElementById("sampleList");
-    sampleList.innerHTML = ""; // ✅ Voorkomt verdubbeling van kaarten
-
-    window.db.collection("samples").orderBy("timestamp", "desc").get().then(snapshot => {
-        snapshot.forEach(doc => {
-            let sample = doc.data();
-            let isOwner = user && sample.userId === user.uid;
-
-            let sampleHTML = `<div id="sample-${doc.id}" class="sample-card">`;
-            sampleHTML += `<p><strong>Whisky:</strong> <span class="sample-name">${sample.name}</span></p>`;
-            sampleHTML += `<p><strong>Leeftijd:</strong> <span class="sample-age">${sample.age ? sample.age.replace(/ years/g, '') + " years" : ""}</span></p>`;
-            sampleHTML += `<p><strong>Type:</strong> <span class="sample-type">${sample.type || ""}</span></p>`;
-            sampleHTML += `<p><strong>Grootte:</strong> <span class="sample-size">${sample.size}</span> cl</p>`;
-            sampleHTML += `<p><strong>Waarde:</strong> €&nbsp;<span class="sample-value">${parseFloat(sample.value).toFixed(2)}</span></p>`;
-            sampleHTML += `<p><strong>Cask:</strong> <span class="sample-cask">${sample.cask || ""}</span></p>`;
-            sampleHTML += `<p><strong>Opmerkingen:</strong> <span class="sample-notes">${sample.notes || ""}</span></p>`;
-
-            // ✅ Correcte weergave van de Whiskybase-link (ZONDER "Whiskybase:" erboven)
-            if (sample.whiskyBaseLink) {
-                sampleHTML += `<p><a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer">Whiskybase</a></p>`;
+function loadSamples() {
+    if (!currentUser) return;
+    
+    const sampleList = document.getElementById("sampleList");
+    sampleList.innerHTML = ""; // Voorkomt dubbele kaarten
+    
+    db.collection("samples")
+        .orderBy("timestamp", "desc")
+        .get()
+        .then(snapshot => {
+            if (snapshot.empty) {
+                sampleList.innerHTML = "<p>Geen samples beschikbaar. Voeg je eerste sample toe!</p>";
+                return;
             }
-
-            if (isOwner) {
-                sampleHTML += `
-                    <button id="edit-btn-${doc.id}" onclick="enableEditMode('${doc.id}')">Bewerken</button>
-                    <button onclick="deleteSample('${doc.id}')">Verwijderen</button>
-                `;
-            }
-
-            sampleHTML += `</div>`;
-            sampleList.innerHTML += sampleHTML;
+            
+            snapshot.forEach(doc => {
+                const sample = doc.data();
+                const isOwner = sample.userId === currentUser.uid;
+                
+                let sampleHTML = `<div id="sample-${doc.id}" class="sample-card">`;
+                sampleHTML += `<p><strong>Whisky:</strong> <span class="sample-name">${sample.name || ""}</span></p>`;
+                
+                if (sample.age) {
+                    // Verwijder mogelijke dubbele "years" en zorg voor juiste weergave
+                    const ageText = sample.age.replace(/\s*years\s*/gi, "").trim();
+                    sampleHTML += `<p><strong>Leeftijd:</strong> <span class="sample-age">${ageText ? ageText + " years" : ""}</span></p>`;
+                } else {
+                    sampleHTML += `<p><strong>Leeftijd:</strong> <span class="sample-age"></span></p>`;
+                }
+                
+                sampleHTML += `<p><strong>Type:</strong> <span class="sample-type">${sample.type || ""}</span></p>`;
+                sampleHTML += `<p><strong>Grootte:</strong> <span class="sample-size">${sample.size || ""}</span> cl</p>`;
+                sampleHTML += `<p><strong>Waarde:</strong> €&nbsp;<span class="sample-value">${parseFloat(sample.value || 0).toFixed(2)}</span></p>`;
+                sampleHTML += `<p><strong>Cask:</strong> <span class="sample-cask">${sample.cask || ""}</span></p>`;
+                sampleHTML += `<p><strong>Opmerkingen:</strong> <span class="sample-notes">${sample.notes || ""}</span></p>`;
+                
+                // Correcte weergave van de Whiskybase-link
+                if (sample.whiskyBaseLink) {
+                    sampleHTML += `<p><a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer" class="sample-whiskyBaseLink">Whiskybase</a></p>`;
+                } else {
+                    sampleHTML += `<p><span class="sample-whiskyBaseLink"></span></p>`;
+                }
+                
+                // Bewerkingsknoppen alleen tonen voor de eigenaar
+                if (isOwner) {
+                    sampleHTML += `
+                        <div class="sample-buttons">
+                            <button id="edit-btn-${doc.id}" onclick="enableEditMode('${doc.id}')">Bewerken</button>
+                            <button onclick="deleteSample('${doc.id}')">Verwijderen</button>
+                        </div>
+                    `;
+                }
+                
+                sampleHTML += `</div>`;
+                sampleList.innerHTML += sampleHTML;
+            });
+        })
+        .catch(error => {
+            console.error("❌ Fout bij laden van samples:", error);
+            sampleList.innerHTML = "<p>Er is een fout opgetreden bij het laden van samples.</p>";
         });
-    }).catch(error => {
-        console.error("❌ Fout bij laden van samples:", error);
-    });
-};
+}
 
-// 🔹 Inschakelen van bewerkingsmodus
-window.enableEditMode = function (docId) {
-    let sampleElement = document.getElementById(`sample-${docId}`);
-    let editButton = document.getElementById(`edit-btn-${docId}`);
-
-    let fields = ["name", "age", "type", "size", "value", "cask", "notes", "whiskyBase"];
-    fields.forEach(field => {
-        let fieldElement = sampleElement.querySelector(`.sample-${field}`);
-        let value = fieldElement ? fieldElement.innerText.trim() : "";
-
-        if (field === "whiskyBase") {
-            let linkElement = fieldElement.querySelector("a");
-            value = linkElement ? linkElement.getAttribute("href") : "";
-        }
-
-        if (field === "notes") {
-            fieldElement.innerHTML = `<textarea class="edit-input" oninput="autoResize(this)">${value}</textarea>`;
-        } else {
-            fieldElement.innerHTML = `<input type="text" value="${value}" class="edit-input">`;
-        }
-    });
-
-    editButton.innerText = "Opslaan";
-    editButton.setAttribute("onclick", `saveSample('${docId}')`);
-
-    let cancelButton = document.createElement("button");
-    cancelButton.innerText = "Annuleren";
-    cancelButton.setAttribute("onclick", `loadSamples()`);
-    cancelButton.id = `cancel-btn-${docId}`;
-    sampleElement.appendChild(cancelButton);
-};
-
-// 🔹 Automatisch hoogte aanpassen voor opmerkingenveld
-window.autoResize = function (element) {
-    element.style.height = "auto";
-    element.style.height = (element.scrollHeight) + "px";
-};
-
-// 🔹 Sample opslaan
-window.saveSample = function (docId) {
-    let sampleElement = document.getElementById(`sample-${docId}`);
-    let updatedData = {
-        name: sampleElement.querySelector(".sample-name input").value.trim(),
-        size: sampleElement.querySelector(".sample-size input").value.trim(),
-        value: parseFloat(sampleElement.querySelector(".sample-value input").value.trim()),
+// 🔹 Sample toevoegen
+function addSample() {
+    if (!currentUser) {
+        alert("❌ Je moet ingelogd zijn om een sample toe te voegen.");
+        return;
+    }
+    
+    const whiskyName = document.getElementById("whiskyName").value.trim();
+    const whiskySize = document.getElementById("whiskySize").value.trim();
+    const whiskyValue = document.getElementById("whiskyValue").value.trim();
+    
+    if (!whiskyName || !whiskySize || !whiskyValue) {
+        alert("❌ Vul ten minste de whisky naam, grootte en waarde in.");
+        return;
+    }
+    
+    // Verzamel alle gegevens voor de nieuwe sample
+    const sampleData = {
+        name: whiskyName,
+        type: document.getElementById("whiskyType").value.trim(),
+        age: document.getElementById("whiskyAge").value.trim(),
+        cask: document.getElementById("whiskyCask").value.trim(),
+        size: whiskySize,
+        value: parseFloat(whiskyValue),
+        whiskyBaseLink: document.getElementById("whiskyBaseLink").value.trim(),
+        notes: document.getElementById("whiskyNotes").value.trim(),
+        userId: currentUser.uid,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
     };
+    
+    // Voeg de sample toe aan Firestore
+    db.collection("samples").add(sampleData)
+        .then(() => {
+            alert("✅ Sample succesvol toegevoegd!");
+            
+            // Reset formuliervelden
+            document.getElementById("whiskyName").value = "";
+            document.getElementById("whiskyType").value = "";
+            document.getElementById("whiskyAge").value = "";
+            document.getElementById("whiskyCask").value = "";
+            document.getElementById("whiskySize").value = "";
+            document.getElementById("whiskyValue").value = "";
+            document.getElementById("whiskyBaseLink").value = "";
+            document.getElementById("whiskyNotes").value = "";
+            
+            // Laad samples opnieuw
+            loadSamples();
+        })
+        .catch(error => {
+            console.error("❌ Fout bij toevoegen van sample:", error);
+            alert("❌ Fout: " + error.message);
+        });
+}
 
-    let optionalFields = ["age", "type", "cask", "notes", "whiskyBase"];
-    optionalFields.forEach(field => {
-        let inputElement = sampleElement.querySelector(`.sample-${field} input, .sample-${field} textarea`);
-        if (inputElement) {
-            let value = inputElement.value.trim();
-            if (value) updatedData[field] = value;
-        }
-    });
+// 🔹 Inschakelen van bewerkingsmodus
+function enableEditMode(docId) {
+    const sampleElement = document.getElementById(`sample-${docId}`);
+    const editButton = document.getElementById(`edit-btn-${docId}`);
+    
+    // Haal alle elementen op die we willen bewerken
+    const nameElement = sampleElement.querySelector(".sample-name");
+    const ageElement = sampleElement.querySelector(".sample-age");
+    const typeElement = sampleElement.querySelector(".sample-type");
+    const sizeElement = sampleElement.querySelector(".sample-size");
+    const valueElement = sampleElement.querySelector(".sample-value");
+    const caskElement = sampleElement.querySelector(".sample-cask");
+    const notesElement = sampleElement.querySelector(".sample-notes");
+    const whiskyBaseLinkElement = sampleElement.querySelector(".sample-whiskyBaseLink");
+    
+    // Bereid de waarden voor (verwijder eventuele labels en eenheden)
+    const name = nameElement.innerText.trim();
+    const age = ageElement.innerText.replace(/\s*years\s*/gi, "").trim();
+    const type = typeElement.innerText.trim();
+    const size = sizeElement.innerText.trim();
+    const value = valueElement.innerText.trim();
+    const cask = caskElement.innerText.trim();
+    const notes = notesElement.innerText.trim();
+    
+    // Haal Whiskybase link op (als die er is)
+    let whiskyBaseLink = "";
+    if (whiskyBaseLinkElement.tagName === "A") {
+        whiskyBaseLink = whiskyBaseLinkElement.getAttribute("href");
+    } else if (whiskyBaseLinkElement.querySelector("a")) {
+        whiskyBaseLink = whiskyBaseLinkElement.querySelector("a").getAttribute("href");
+    }
+    
+    // Vervang de tekst door invoervelden
+    nameElement.innerHTML = `<input type="text" value="${name}" class="edit-input">`;
+    ageElement.innerHTML = `<input type="text" value="${age}" class="edit-input">`;
+    typeElement.innerHTML = `<input type="text" value="${type}" class="edit-input">`;
+    sizeElement.innerHTML = `<input type="number" value="${size}" class="edit-input" min="1">`;
+    valueElement.innerHTML = `<input type="text" value="${value}" class="edit-input">`;
+    caskElement.innerHTML = `<input type="text" value="${cask}" class="edit-input">`;
+    notesElement.innerHTML = `<textarea class="edit-input" oninput="autoResize(this)">${notes}</textarea>`;
+    
+    // Hulpfunctie om de Whiskybase link te bewerken - zelfs als er geen was
+    whiskyBaseLinkElement.innerHTML = `<input type="url" value="${whiskyBaseLink}" class="edit-input" placeholder="Link naar Whiskybase">`;
+    
+    // Verander de knoppen
+    editButton.innerText = "Opslaan";
+    editButton.setAttribute("onclick", `saveSample('${docId}')`);
+    
+    // Voeg een annuleerknop toe als deze er nog niet is
+    if (!document.getElementById(`cancel-btn-${docId}`)) {
+        const cancelButton = document.createElement("button");
+        cancelButton.innerText = "Annuleren";
+        cancelButton.setAttribute("onclick", `cancelEdit('${docId}')`);
+        cancelButton.id = `cancel-btn-${docId}`;
+        sampleElement.querySelector(".sample-buttons").appendChild(cancelButton);
+    }
+    
+    // Auto-resize voor de textarea
+    autoResize(sampleElement.querySelector("textarea"));
+}
 
+// 🔹 Annuleren van bewerkingsmodus
+function cancelEdit(docId) {
+    // We laden gewoon alles opnieuw
+    loadSamples();
+}
+
+// 🔹 Sample opslaan na bewerking
+function saveSample(docId) {
+    const sampleElement = document.getElementById(`sample-${docId}`);
+    
+    // Haal de waarden op uit de invoervelden
+    const name = sampleElement.querySelector(".sample-name input").value.trim();
+    const age = sampleElement.querySelector(".sample-age input").value.trim();
+    const type = sampleElement.querySelector(".sample-type input").value.trim();
+    const size = sampleElement.querySelector(".sample-size input").value.trim();
+    const value = sampleElement.querySelector(".sample-value input").value.trim();
+    const cask = sampleElement.querySelector(".sample-cask input").value.trim();
+    const notes = sampleElement.querySelector(".sample-notes textarea").value.trim();
+    const whiskyBaseLink = sampleElement.querySelector(".sample-whiskyBaseLink input").value.trim();
+    
+    // Valideer verplichte velden
+    if (!name || !size || !value) {
+        alert("❌ Whisky naam, grootte en waarde zijn verplicht.");
+        return;
+    }
+    
+    // Bereid de gegevens voor
+    const updatedData = {
+        name: name,
+        size: size,
+        value: parseFloat(value),
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    
+    // Voeg optionele velden toe als ze niet leeg zijn
+    if (age) updatedData.age = age;
+    if (type) updatedData.type = type;
+    if (cask) updatedData.cask = cask;
+    if (notes) updatedData.notes = notes;
+    if (whiskyBaseLink) updatedData.whiskyBaseLink = whiskyBaseLink;
+    
+    // Update de sample in de database
     db.collection("samples").doc(docId).update(updatedData)
         .then(() => {
             alert("✅ Sample bijgewerkt!");
@@ -163,17 +342,57 @@ window.saveSample = function (docId) {
         })
         .catch(error => {
             console.error("❌ Fout bij bijwerken:", error);
+            alert("❌ Fout: " + error.message);
         });
-};
+}
 
 // 🔹 Sample verwijderen
-window.deleteSample = function (id) {
-    db.collection("samples").doc(id).delete().then(() => {
-        alert("✅ Sample verwijderd!");
-        loadSamples(); // ✅ Voorkomt dat knoppen verdwijnen
-    }).catch(error => {
-        console.error("❌ Fout bij verwijderen: ", error);
+function deleteSample(docId) {
+    if (confirm("Weet je zeker dat je deze sample wilt verwijderen?")) {
+        db.collection("samples").doc(docId).delete()
+            .then(() => {
+                alert("✅ Sample verwijderd!");
+                loadSamples();
+            })
+            .catch(error => {
+                console.error("❌ Fout bij verwijderen: ", error);
+                alert("❌ Fout: " + error.message);
+            });
+    }
+}
+
+// 🔹 Automatisch hoogte aanpassen voor opmerkingenveld
+function autoResize(element) {
+    if (!element) return;
+    
+    element.style.height = "auto";
+    element.style.height = (element.scrollHeight) + "px";
+}
+
+// Automatisch controleren of gebruiker ingelogd is bij opstarten
+window.onload = () => {
+    // Initialiseer autoresize voor alle textareas
+    document.querySelectorAll('textarea').forEach(textarea => {
+        autoResize(textarea);
+        textarea.addEventListener('input', function() {
+            autoResize(this);
+        });
     });
+    
+    // Controleer gebruikersstatus
+    checkUser();
 };
+
+// Exporteer de functie voor gebruik in HTML
+window.register = register;
+window.login = login;
+window.resetPassword = resetPassword;
+window.logout = logout;
+window.addSample = addSample;
+window.enableEditMode = enableEditMode;
+window.cancelEdit = cancelEdit;
+window.saveSample = saveSample;
+window.deleteSample = deleteSample;
+window.autoResize = autoResize;
 
 console.log("✅ Script is volledig geladen!");
