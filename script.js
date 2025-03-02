@@ -160,8 +160,8 @@ function loadSamples(user) {
                 if (isOwner) {
                     sampleHTML += `
                         <div class="sample-buttons">
-                            <button id="edit-btn-${doc.id}" onclick="enableEditMode('${doc.id}')">Bewerken</button>
-                            <button onclick="deleteSample('${doc.id}')">Verwijderen</button>
+                            <button class="edit-btn" onclick="enableEditMode('${doc.id}')">Bewerken</button>
+                            <button class="delete-btn" onclick="deleteSample('${doc.id}')">Verwijderen</button>
                         </div>
                     `;
                 }
@@ -290,8 +290,13 @@ function addSample() {
 
 // 🔹 Inschakelen van bewerkingsmodus
 function enableEditMode(docId) {
+    console.log("Edit mode enabled for sample:", docId);
+    
     const sampleElement = document.getElementById(`sample-${docId}`);
-    const editButton = document.getElementById(`edit-btn-${docId}`);
+    if (!sampleElement) {
+        console.error("❌ Sample element niet gevonden:", docId);
+        return;
+    }
     
     // Haal alle elementen op die we willen bewerken
     const nameElement = sampleElement.querySelector(".sample-name");
@@ -301,7 +306,12 @@ function enableEditMode(docId) {
     const sizeElement = sampleElement.querySelector(".sample-size");
     const valueElement = sampleElement.querySelector(".sample-value");
     const notesElement = sampleElement.querySelector(".sample-notes");
-    const whiskyBaseLinkElement = sampleElement.querySelector(".sample-whiskyBaseLink");
+    
+    // Controleer of alle elementen gevonden zijn
+    if (!nameElement || !ageElement || !typeElement || !caskElement || !sizeElement || !valueElement || !notesElement) {
+        console.error("❌ Niet alle velden gevonden voor sample:", docId);
+        return;
+    }
     
     // Bereid de waarden voor (verwijder eventuele labels en eenheden)
     const name = nameElement.innerText.trim();
@@ -313,11 +323,14 @@ function enableEditMode(docId) {
     const notes = notesElement.innerText.trim();
     
     // Haal Whiskybase link op (als die er is)
+    let whiskyBaseLinkElement = sampleElement.querySelector(".sample-whiskyBaseLink");
     let whiskyBaseLink = "";
-    if (whiskyBaseLinkElement.tagName === "A") {
-        whiskyBaseLink = whiskyBaseLinkElement.getAttribute("href");
-    } else if (whiskyBaseLinkElement.querySelector("a")) {
-        whiskyBaseLink = whiskyBaseLinkElement.querySelector("a").getAttribute("href");
+    
+    if (whiskyBaseLinkElement) {
+        const linkElement = whiskyBaseLinkElement.querySelector("a");
+        if (linkElement) {
+            whiskyBaseLink = linkElement.getAttribute("href");
+        }
     }
     
     // Vervang de tekst door invoervelden
@@ -330,49 +343,46 @@ function enableEditMode(docId) {
     notesElement.innerHTML = `<textarea class="edit-input" oninput="autoResize(this)">${notes}</textarea>`;
     
     // Hulpfunctie om de Whiskybase link te bewerken - als platte tekst
-    whiskyBaseLinkElement.innerHTML = `<span>Link naar Whiskybase:</span> <input type="url" value="${whiskyBaseLink}" class="edit-input" placeholder="Link naar Whiskybase">`;
+    if (whiskyBaseLinkElement) {
+        whiskyBaseLinkElement.innerHTML = `<span>Link naar Whiskybase:</span> <input type="url" value="${whiskyBaseLink}" class="edit-input" placeholder="Link naar Whiskybase">`;
+    }
     
-    // Voorkom dat links worden geopend tijdens het bewerken
-    const links = sampleElement.querySelectorAll('a');
-    links.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-        });
-    });
-    
-    // Verander de knoppen en maak buttons met de juiste volgorde: Opslaan, Annuleren, Verwijderen
+    // Verberg alle knoppen en maak nieuwe knoppen
     const buttonsContainer = sampleElement.querySelector(".sample-buttons");
-    
-    // Verwijder bestaande knoppen
-    buttonsContainer.innerHTML = "";
-    
-    // Voeg nieuwe knoppen toe in de gewenste volgorde
-    const saveButton = document.createElement("button");
-    saveButton.innerText = "Opslaan";
-    saveButton.setAttribute("onclick", `saveSample('${docId}')`);
-    saveButton.id = `save-btn-${docId}`;
-    buttonsContainer.appendChild(saveButton);
-    
-    const cancelButton = document.createElement("button");
-    cancelButton.innerText = "Annuleren";
-    cancelButton.setAttribute("onclick", `cancelEdit('${docId}')`);
-    cancelButton.id = `cancel-btn-${docId}`;
-    buttonsContainer.appendChild(cancelButton);
-    
-    const deleteButton = document.createElement("button");
-    deleteButton.innerText = "Verwijderen";
-    deleteButton.setAttribute("onclick", `deleteSample('${docId}')`);
-    deleteButton.id = `delete-btn-${docId}`;
-    buttonsContainer.appendChild(deleteButton);
+    if (buttonsContainer) {
+        // Verwijder bestaande knoppen
+        buttonsContainer.innerHTML = "";
+        
+        // Voeg nieuwe knoppen toe in de gewenste volgorde
+        const saveButton = document.createElement("button");
+        saveButton.innerText = "Opslaan";
+        saveButton.onclick = function() { saveSample(docId); };
+        saveButton.className = "save-btn";
+        buttonsContainer.appendChild(saveButton);
+        
+        const cancelButton = document.createElement("button");
+        cancelButton.innerText = "Annuleren";
+        cancelButton.onclick = function() { cancelEdit(docId); };
+        cancelButton.className = "cancel-btn";
+        buttonsContainer.appendChild(cancelButton);
+        
+        const deleteButton = document.createElement("button");
+        deleteButton.innerText = "Verwijderen";
+        deleteButton.onclick = function() { deleteSample(docId); };
+        deleteButton.className = "delete-btn";
+        buttonsContainer.appendChild(deleteButton);
+    }
     
     // Auto-resize voor de textarea met event listener voor aanpassingen
     const textarea = sampleElement.querySelector("textarea");
-    autoResize(textarea);
-    
-    // Zorg ervoor dat textarea meegroeit terwijl gebruiker typt
-    textarea.addEventListener('input', function() {
-        autoResize(this);
-    });
+    if (textarea) {
+        autoResize(textarea);
+        
+        // Zorg ervoor dat textarea meegroeit terwijl gebruiker typt
+        textarea.addEventListener('input', function() {
+            autoResize(this);
+        });
+    }
 }
 
 // 🔹 Annuleren van bewerkingsmodus
@@ -384,16 +394,34 @@ function cancelEdit(docId) {
 // 🔹 Sample opslaan na bewerking
 function saveSample(docId) {
     const sampleElement = document.getElementById(`sample-${docId}`);
+    if (!sampleElement) {
+        console.error("❌ Sample element niet gevonden bij opslaan:", docId);
+        return;
+    }
     
     // Haal de waarden op uit de invoervelden
-    const name = sampleElement.querySelector(".sample-name input").value.trim();
-    const age = sampleElement.querySelector(".sample-age input").value.trim();
-    const type = sampleElement.querySelector(".sample-type input").value.trim();
-    const cask = sampleElement.querySelector(".sample-cask input").value.trim();
-    const size = sampleElement.querySelector(".sample-size input").value.trim();
-    const value = sampleElement.querySelector(".sample-value input").value.trim();
-    const notes = sampleElement.querySelector(".sample-notes textarea").value.trim();
-    const whiskyBaseLink = sampleElement.querySelector(".sample-whiskyBaseLink input").value.trim();
+    const nameInput = sampleElement.querySelector(".sample-name input");
+    const ageInput = sampleElement.querySelector(".sample-age input");
+    const typeInput = sampleElement.querySelector(".sample-type input");
+    const caskInput = sampleElement.querySelector(".sample-cask input");
+    const sizeInput = sampleElement.querySelector(".sample-size input");
+    const valueInput = sampleElement.querySelector(".sample-value input");
+    const notesTextarea = sampleElement.querySelector(".sample-notes textarea");
+    const whiskyBaseLinkInput = sampleElement.querySelector(".sample-whiskyBaseLink input");
+    
+    if (!nameInput || !sizeInput || !valueInput) {
+        console.error("❌ Verplichte velden niet gevonden bij opslaan:", docId);
+        return;
+    }
+    
+    const name = nameInput.value.trim();
+    const age = ageInput ? ageInput.value.trim() : "";
+    const type = typeInput ? typeInput.value.trim() : "";
+    const cask = caskInput ? caskInput.value.trim() : "";
+    const size = sizeInput.value.trim();
+    const value = valueInput.value.trim();
+    const notes = notesTextarea ? notesTextarea.value.trim() : "";
+    const whiskyBaseLink = whiskyBaseLinkInput ? whiskyBaseLinkInput.value.trim() : "";
     
     // Valideer verplichte velden
     if (!name || !size || !value) {
@@ -475,7 +503,7 @@ window.onload = () => {
     checkUser();
 };
 
-// Exporteer de functie voor gebruik in HTML
+// Zorg ervoor dat alle functies beschikbaar zijn in het window-object
 window.register = register;
 window.login = login;
 window.resetPassword = resetPassword;
