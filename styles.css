@@ -2,9 +2,22 @@ body {
     font-family: Arial, sans-serif;
     margin: 20px;
     text-align: center;
+    background-color: #f5f5f5;
+    color: #333;
+    line-height: 1.6;
 }
 
-input {
+h1 {
+    color: #ff9900;
+    margin-bottom: 20px;
+}
+
+h2 {
+    color: #666;
+    margin: 20px 0 10px;
+}
+
+input, textarea {
     display: block;
     margin: 10px auto;
     padding: 10px;
@@ -16,10 +29,16 @@ input {
     box-sizing: border-box;
 }
 
+input:focus, textarea:focus {
+    border-color: #ff9900;
+    outline: none;
+    box-shadow: 0 0 5px rgba(255, 153, 0, 0.3);
+}
+
 button {
-    display: inline-block; /* Zorgt ervoor dat de knop zo breed is als nodig */
-    width: auto; /* Past de breedte aan op basis van de tekst */
-    padding: 10px 20px; /* Houdt de knop compact maar leesbaar */
+    display: inline-block;
+    width: auto;
+    padding: 10px 20px;
     background-color: #ff9900;
     border: none;
     color: white;
@@ -27,7 +46,8 @@ button {
     text-align: center;
     border-radius: 5px;
     font-size: 16px;
-    margin: 10px auto; /* Centreert de knop */
+    margin: 10px 5px;
+    transition: background-color 0.3s ease;
 }
 
 button:hover {
@@ -35,40 +55,90 @@ button:hover {
 }
 
 #logoutButton {
-    position: absolute; /* Zet de knop op een vaste positie */
-    top: 20px; /* Afstand vanaf de bovenkant */
-    left: 20px; /* Plaats de knop aan de linkerkant */
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: #999;
+}
+
+#logoutButton:hover {
+    background-color: #777;
+}
+
+#userStatus {
+    margin: 20px 0;
+    font-weight: bold;
+}
+
+#addSampleForm {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+    max-width: 500px;
 }
 
 .sample-card {
+    background-color: white;
     border: 1px solid #ddd;
-    padding: 10px;
-    margin: 10px auto;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px auto;
     width: 80%;
     max-width: 400px;
     text-align: left;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.sample-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.sample-card p {
+    margin: 8px 0;
+}
+
+.sample-card strong {
+    color: #666;
+}
+
+.sample-buttons {
+    margin-top: 15px;
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+}
+
+.sample-card a {
+    color: #ff9900;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.sample-card a:hover {
+    text-decoration: underline;
 }
 
 textarea {
-    display: block;
-    width: 80%;
-    max-width: 300px;
-    padding: 10px;
-    font-size: 16px;
-    font-family: inherit; /* Hiermee krijgt het hetzelfde lettertype als de rest */
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    min-height: 60px;
     resize: none;
     overflow-y: hidden;
-    min-height: 40px;
     line-height: 1.5;
-    box-sizing: border-box;
-    margin: 10px auto;
-    background-color: white;
+    font-family: inherit;
 }
 
+.edit-input {
+    width: 100%;
+    padding: 5px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    margin: 0;
+}
 
-
-
-
-
+#samplesContainer {
+    margin-top: 30px;
+}
