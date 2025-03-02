@@ -31,7 +31,7 @@ function checkUser() {
             userStatus.innerText = "❌ Niet ingelogd";
             logoutButton.style.display = "none";
             addSampleForm.style.display = "none";
-            document.getElementById("sampleList").innerHTML = "";
+            loadSamplesForGuests(); // Laad samples voor niet-ingelogde gebruikers
         }
     });
 }
@@ -111,7 +111,7 @@ function logout() {
         });
 }
 
-// 🔹 Samples ophalen en weergeven
+// 🔹 Samples ophalen en weergeven voor ingelogde gebruikers
 function loadSamples(user) {
     if (!user) return;
     
@@ -146,7 +146,7 @@ function loadSamples(user) {
                 sampleHTML += `<p><strong>Type:</strong> <span class="sample-type">${sample.type || ""}</span></p>`;
                 sampleHTML += `<p><strong>Cask:</strong> <span class="sample-cask">${sample.cask || ""}</span></p>`;
                 sampleHTML += `<p><strong>Grootte:</strong> <span class="sample-size">${sample.size || ""}</span> cl</p>`;
-                sampleHTML += `<p><strong>Waarde:</strong> €&nbsp;<span class="sample-value">${parseFloat(sample.value || 0).toFixed(2)}</span></p>`;
+                sampleHTML += `<p><strong>Prijs:</strong> €&nbsp;<span class="sample-value">${parseFloat(sample.value || 0).toFixed(2)}</span></p>`;
                 sampleHTML += `<p><strong>Opmerkingen:</strong> <span class="sample-notes">${sample.notes || ""}</span></p>`;
                 
                 // Correcte weergave van de Whiskybase-link
@@ -188,10 +188,14 @@ function addSample() {
     const whiskySize = document.getElementById("whiskySize").value.trim();
     const whiskyValue = document.getElementById("whiskyValue").value.trim();
     
+    // Valideer verplichte velden
     if (!whiskyName || !whiskySize || !whiskyValue) {
-        alert("❌ Vul ten minste de whisky naam, grootte en waarde in.");
+        alert("❌ Vul ten minste de whisky naam, grootte en prijs in.");
         return;
     }
+    
+    // Normaliseer de prijs (accepteer zowel ',' als '.' als decimaalscheider)
+    const normalizedValue = whiskyValue.replace(',', '.');
     
     // Verzamel alle gegevens voor de nieuwe sample
     const sampleData = {
@@ -200,7 +204,7 @@ function addSample() {
         type: document.getElementById("whiskyType").value.trim(),
         cask: document.getElementById("whiskyCask").value.trim(),
         size: whiskySize,
-        value: parseFloat(whiskyValue),
+        value: parseFloat(normalizedValue),
         notes: document.getElementById("whiskyNotes").value.trim(),
         whiskyBaseLink: document.getElementById("whiskyBaseLink").value.trim(),
         userId: currentUser.uid,
@@ -235,6 +239,13 @@ function addSample() {
 function enableEditMode(docId) {
     const sampleElement = document.getElementById(`sample-${docId}`);
     const editButton = document.getElementById(`edit-btn-${docId}`);
+    
+    // Voorkom dat links worden geopend tijdens het bewerken
+    sampleElement.addEventListener('click', function(e) {
+        if (e.target.tagName === 'A') {
+            e.preventDefault();
+        }
+    });
     
     // Haal alle elementen op die we willen bewerken
     const nameElement = sampleElement.querySelector(".sample-name");
@@ -271,7 +282,9 @@ function enableEditMode(docId) {
     sizeElement.innerHTML = `<input type="number" value="${size}" class="edit-input" min="1">`;
     valueElement.innerHTML = `<input type="text" value="${value}" class="edit-input">`;
     notesElement.innerHTML = `<textarea class="edit-input" oninput="autoResize(this)">${notes}</textarea>`;
-    whiskyBaseLinkElement.innerHTML = `<input type="url" value="${whiskyBaseLink}" class="edit-input" placeholder="Link naar Whiskybase">`;
+    
+    // Hulpfunctie om de Whiskybase link te bewerken - zelfs als er geen was
+    whiskyBaseLinkElement.innerHTML = `<strong>Link naar Whiskybase:</strong> <input type="url" value="${whiskyBaseLink}" class="edit-input" placeholder="Link naar Whiskybase">`;
     
     // Verander de knoppen en maak buttons met de juiste volgorde: Opslaan, Annuleren, Verwijderen
     const buttonsContainer = sampleElement.querySelector(".sample-buttons");
@@ -302,6 +315,60 @@ function enableEditMode(docId) {
     autoResize(sampleElement.querySelector("textarea"));
 }
 
+// 🔹 Samples ophalen en weergeven voor niet-ingelogde gebruikers
+function loadSamplesForGuests() {
+    const sampleList = document.getElementById("sampleList");
+    sampleList.innerHTML = ""; // Voorkomt dubbele kaarten
+    
+    db.collection("samples")
+        .orderBy("timestamp", "desc")
+        .get()
+        .then(snapshot => {
+            if (snapshot.empty) {
+                sampleList.innerHTML = "<p>Geen samples beschikbaar.</p>";
+                return;
+            }
+            
+            snapshot.forEach(doc => {
+                const sample = doc.data();
+                
+                // Aangepaste volgorde van velden zoals verzocht
+                let sampleHTML = `<div id="sample-${doc.id}" class="sample-card">`;
+                sampleHTML += `<p><strong>Whisky:</strong> <span class="sample-name">${sample.name || ""}</span></p>`;
+                
+                if (sample.age) {
+                    // Verwijder mogelijke dubbele "years" en zorg voor juiste weergave
+                    const ageText = sample.age.replace(/\s*years\s*/gi, "").trim();
+                    sampleHTML += `<p><strong>Leeftijd:</strong> <span class="sample-age">${ageText ? ageText + " years" : ""}</span></p>`;
+                } else {
+                    sampleHTML += `<p><strong>Leeftijd:</strong> <span class="sample-age"></span></p>`;
+                }
+                
+                sampleHTML += `<p><strong>Type:</strong> <span class="sample-type">${sample.type || ""}</span></p>`;
+                sampleHTML += `<p><strong>Cask:</strong> <span class="sample-cask">${sample.cask || ""}</span></p>`;
+                sampleHTML += `<p><strong>Grootte:</strong> <span class="sample-size">${sample.size || ""}</span> cl</p>`;
+                sampleHTML += `<p><strong>Prijs:</strong> €&nbsp;<span class="sample-value">${parseFloat(sample.value || 0).toFixed(2)}</span></p>`;
+                sampleHTML += `<p><strong>Opmerkingen:</strong> <span class="sample-notes">${sample.notes || ""}</span></p>`;
+                
+                // Correcte weergave van de Whiskybase-link
+                if (sample.whiskyBaseLink) {
+                    sampleHTML += `<p><a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer" class="sample-whiskyBaseLink">Whiskybase</a></p>`;
+                } else {
+                    sampleHTML += `<p><span class="sample-whiskyBaseLink"></span></p>`;
+                }
+                
+                // Voor gasten zijn er geen bewerkingsknoppen
+                
+                sampleHTML += `</div>`;
+                sampleList.innerHTML += sampleHTML;
+            });
+        })
+        .catch(error => {
+            console.error("❌ Fout bij laden van samples:", error);
+            sampleList.innerHTML = "<p>Er is een fout opgetreden bij het laden van samples.</p>";
+        });
+}
+
 // 🔹 Annuleren van bewerkingsmodus
 function cancelEdit(docId) {
     // We laden gewoon alles opnieuw
@@ -324,15 +391,18 @@ function saveSample(docId) {
     
     // Valideer verplichte velden
     if (!name || !size || !value) {
-        alert("❌ Whisky naam, grootte en waarde zijn verplicht.");
+        alert("❌ Whisky naam, grootte en prijs zijn verplicht.");
         return;
     }
+    
+    // Normaliseer de prijs (accepteer zowel ',' als '.' als decimaalscheider)
+    const normalizedValue = value.replace(',', '.');
     
     // Bereid de gegevens voor
     const updatedData = {
         name: name,
         size: size,
-        value: parseFloat(value),
+        value: parseFloat(normalizedValue),
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
     };
     
