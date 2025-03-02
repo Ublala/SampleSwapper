@@ -294,10 +294,15 @@ function enableEditMode(docId) {
     const editButton = document.getElementById(`edit-btn-${docId}`);
     
     // Voorkom dat links worden geopend tijdens het bewerken
-    sampleElement.addEventListener('click', function(e) {
-        if (e.target.tagName === 'A') {
-            e.preventDefault();
-        }
+    // Verwijder eerst alle bestaande links in het element
+    const links = sampleElement.querySelectorAll('a');
+    links.forEach(link => {
+        const linkUrl = link.getAttribute('href');
+        const linkText = link.textContent;
+        const span = document.createElement('span');
+        span.textContent = linkText;
+        span.dataset.url = linkUrl;
+        link.parentNode.replaceChild(span, link);
     });
     
     // Haal alle elementen op die we willen bewerken
@@ -336,8 +341,8 @@ function enableEditMode(docId) {
     valueElement.innerHTML = `<input type="text" value="${value}" class="edit-input">`;
     notesElement.innerHTML = `<textarea class="edit-input" oninput="autoResize(this)">${notes}</textarea>`;
     
-    // Hulpfunctie om de Whiskybase link te bewerken - zelfs als er geen was
-    whiskyBaseLinkElement.innerHTML = `<strong>Link naar Whiskybase:</strong> <input type="url" value="${whiskyBaseLink}" class="edit-input" placeholder="Link naar Whiskybase">`;
+    // Hulpfunctie om de Whiskybase link te bewerken - als platte tekst
+    whiskyBaseLinkElement.innerHTML = `<span>Link naar Whiskybase:</span> <input type="url" value="${whiskyBaseLink}" class="edit-input" placeholder="Link naar Whiskybase">`;
     
     // Verander de knoppen en maak buttons met de juiste volgorde: Opslaan, Annuleren, Verwijderen
     const buttonsContainer = sampleElement.querySelector(".sample-buttons");
@@ -364,8 +369,14 @@ function enableEditMode(docId) {
     deleteButton.id = `delete-btn-${docId}`;
     buttonsContainer.appendChild(deleteButton);
     
-    // Auto-resize voor de textarea
-    autoResize(sampleElement.querySelector("textarea"));
+    // Auto-resize voor de textarea met event listener voor aanpassingen
+    const textarea = sampleElement.querySelector("textarea");
+    autoResize(textarea);
+    
+    // Zorg ervoor dat textarea meegroeit terwijl gebruiker typt
+    textarea.addEventListener('input', function() {
+        autoResize(this);
+    });
 }
 
 // 🔹 Annuleren van bewerkingsmodus
@@ -443,8 +454,15 @@ function deleteSample(docId) {
 function autoResize(element) {
     if (!element) return;
     
+    // Reset de hoogte eerst zodat we de echte contentHeight kunnen bepalen
     element.style.height = "auto";
-    element.style.height = (element.scrollHeight) + "px";
+    
+    // Stel een minimumhoogte in en pas vervolgens aan naar inhoud
+    const extraPadding = 5; // Extra ruimte om zeker te zijn dat alles zichtbaar is
+    element.style.height = Math.max(80, element.scrollHeight + extraPadding) + "px";
+    
+    // Zorgt ervoor dat de scrollbar niet verschijnt
+    element.style.overflowY = "hidden";
 }
 
 // Automatisch controleren of gebruiker ingelogd is bij opstarten
