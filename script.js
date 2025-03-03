@@ -155,6 +155,7 @@ function loadSamples(user) {
                     sampleHTML += `<p><strong>Opmerkingen:</strong> <span class="sample-notes">${sample.notes}</span></p>`;
                 }
                 
+                // Alleen de Whiskybase link toevoegen zonder enige extra tekst ervoor
                 if (sample.whiskyBaseLink && sample.whiskyBaseLink.trim()) {
                     sampleHTML += `<p><a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer" class="sample-whiskyBaseLink">Whiskybase</a></p>`;
                 }
@@ -219,6 +220,7 @@ function loadSamplesForGuests() {
                     sampleHTML += `<p><strong>Opmerkingen:</strong> <span class="sample-notes">${sample.notes}</span></p>`;
                 }
                 
+                // Alleen de Whiskybase link toevoegen zonder enige extra tekst ervoor
                 if (sample.whiskyBaseLink && sample.whiskyBaseLink.trim()) {
                     sampleHTML += `<p><a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer" class="sample-whiskyBaseLink">Whiskybase</a></p>`;
                 }
@@ -366,14 +368,14 @@ function saveSample(docId) {
         return;
     }
     
-    // Haal waarden op
-    const name = sampleElement.querySelector(".edit-name").value.trim();
-    const age = sampleElement.querySelector(".edit-age").value.trim();
-    const type = sampleElement.querySelector(".edit-type").value.trim();
-    const cask = sampleElement.querySelector(".edit-cask").value.trim();
-    const size = sampleElement.querySelector(".edit-size").value.trim();
-    const value = sampleElement.querySelector(".edit-value").value.trim();
-    const notes = sampleElement.querySelector(".edit-notes").value.trim();
+    // Haal waarden op en verwijder mogelijke dubbele labels
+    const name = sampleElement.querySelector(".edit-name").value.trim().replace(/^(Type:|Whisky:)\s*/i, "");
+    const age = sampleElement.querySelector(".edit-age").value.trim().replace(/^(Leeftijd:)\s*/i, "");
+    const type = sampleElement.querySelector(".edit-type").value.trim().replace(/^(Type:)\s*/i, "");
+    const cask = sampleElement.querySelector(".edit-cask").value.trim().replace(/^(Cask:)\s*/i, "");
+    const size = sampleElement.querySelector(".edit-size").value.trim().replace(/^(Grootte:)\s*/i, "");
+    const value = sampleElement.querySelector(".edit-value").value.trim().replace(/^(Prijs:|€)\s*/i, "");
+    const notes = sampleElement.querySelector(".edit-notes").value.trim().replace(/^(Opmerkingen:)\s*/i, "");
     const whiskyBaseLink = sampleElement.querySelector(".edit-whiskybase").value.trim();
     
     // Valideer verplichte velden
