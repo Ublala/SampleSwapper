@@ -156,7 +156,7 @@ function loadSamples(user) {
                 }
                 
                 if (sample.whiskyBaseLink && sample.whiskyBaseLink.trim()) {
-                    sampleHTML += `<p class="whiskybase-container"><strong>Link naar Whiskybase:</strong> <a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer" class="sample-whiskyBaseLink">Whiskybase</a></p>`;
+                    sampleHTML += `<p><a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer" class="sample-whiskyBaseLink">Whiskybase</a></p>`;
                 }
                 
                 if (isOwner) {
@@ -220,7 +220,7 @@ function loadSamplesForGuests() {
                 }
                 
                 if (sample.whiskyBaseLink && sample.whiskyBaseLink.trim()) {
-                    sampleHTML += `<p class="whiskybase-container"><strong>Link naar Whiskybase:</strong> <a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer" class="sample-whiskyBaseLink">Whiskybase</a></p>`;
+                    sampleHTML += `<p><a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer" class="sample-whiskyBaseLink">Whiskybase</a></p>`;
                 }
                 
                 sampleHTML += `</div>`;
