@@ -133,27 +133,50 @@ function loadSamples(user) {
                 
                 // Aangepaste volgorde van velden zoals verzocht
                 let sampleHTML = `<div id="sample-${doc.id}" class="sample-card">`;
+                
+                // Voeg altijd de whisky naam toe (verplicht veld)
                 sampleHTML += `<p><strong>Whisky:</strong> <span class="sample-name">${sample.name || ""}</span></p>`;
                 
-                if (sample.age) {
-                    // Verwijder mogelijke dubbele "years" en zorg voor juiste weergave
+                // Voeg leeftijd toe als die bestaat
+                if (sample.age && sample.age.trim() !== "") {
                     const ageText = sample.age.replace(/\s*years\s*/gi, "").trim();
                     sampleHTML += `<p><strong>Leeftijd:</strong> <span class="sample-age">${ageText ? ageText + " years" : ""}</span></p>`;
                 } else {
-                    sampleHTML += `<p><strong>Leeftijd:</strong> <span class="sample-age"></span></p>`;
+                    sampleHTML += `<p style="display:none;"><strong>Leeftijd:</strong> <span class="sample-age"></span></p>`;
                 }
                 
-                sampleHTML += `<p><strong>Type:</strong> <span class="sample-type">${sample.type || ""}</span></p>`;
-                sampleHTML += `<p><strong>Cask:</strong> <span class="sample-cask">${sample.cask || ""}</span></p>`;
-                sampleHTML += `<p><strong>Grootte:</strong> <span class="sample-size">${sample.size || ""}</span> cl</p>`;
-                sampleHTML += `<p><strong>Prijs:</strong> €&nbsp;<span class="sample-value">${parseFloat(sample.value || 0).toFixed(2)}</span></p>`;
-                sampleHTML += `<p><strong>Opmerkingen:</strong> <span class="sample-notes">${sample.notes || ""}</span></p>`;
-                
-                // Correcte weergave van de Whiskybase-link
-                if (sample.whiskyBaseLink) {
-                    sampleHTML += `<p><a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer" class="sample-whiskyBaseLink">Whiskybase</a></p>`;
+                // Voeg type toe als die bestaat
+                if (sample.type && sample.type.trim() !== "") {
+                    sampleHTML += `<p><strong>Type:</strong> <span class="sample-type">${sample.type}</span></p>`;
                 } else {
-                    sampleHTML += `<p><span class="sample-whiskyBaseLink"></span></p>`;
+                    sampleHTML += `<p style="display:none;"><strong>Type:</strong> <span class="sample-type"></span></p>`;
+                }
+                
+                // Voeg cask toe als die bestaat
+                if (sample.cask && sample.cask.trim() !== "") {
+                    sampleHTML += `<p><strong>Cask:</strong> <span class="sample-cask">${sample.cask}</span></p>`;
+                } else {
+                    sampleHTML += `<p style="display:none;"><strong>Cask:</strong> <span class="sample-cask"></span></p>`;
+                }
+                
+                // Voeg altijd grootte toe (verplicht veld)
+                sampleHTML += `<p><strong>Grootte:</strong> <span class="sample-size">${sample.size || ""}</span> cl</p>`;
+                
+                // Voeg altijd prijs toe (verplicht veld)
+                sampleHTML += `<p><strong>Prijs:</strong> €&nbsp;<span class="sample-value">${parseFloat(sample.value || 0).toFixed(2)}</span></p>`;
+                
+                // Voeg opmerkingen toe als die bestaan
+                if (sample.notes && sample.notes.trim() !== "") {
+                    sampleHTML += `<p><strong>Opmerkingen:</strong> <span class="sample-notes">${sample.notes}</span></p>`;
+                } else {
+                    sampleHTML += `<p style="display:none;"><strong>Opmerkingen:</strong> <span class="sample-notes"></span></p>`;
+                }
+                
+                // Voeg whiskybase link toe als die bestaat
+                if (sample.whiskyBaseLink && sample.whiskyBaseLink.trim() !== "") {
+                    sampleHTML += `<p><strong>Link naar Whiskybase:</strong> <a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer" class="sample-whiskyBaseLink">Whiskybase</a></p>`;
+                } else {
+                    sampleHTML += `<p style="display:none;"><strong>Link naar Whiskybase:</strong> <span class="sample-whiskyBaseLink"></span></p>`;
                 }
                 
                 // Bewerkingsknoppen alleen tonen voor de eigenaar
@@ -195,27 +218,50 @@ function loadSamplesForGuests() {
                 
                 // Aangepaste volgorde van velden zoals verzocht
                 let sampleHTML = `<div id="sample-${doc.id}" class="sample-card">`;
+                
+                // Voeg altijd de whisky naam toe (verplicht veld)
                 sampleHTML += `<p><strong>Whisky:</strong> <span class="sample-name">${sample.name || ""}</span></p>`;
                 
-                if (sample.age) {
-                    // Verwijder mogelijke dubbele "years" en zorg voor juiste weergave
+                // Voeg leeftijd toe als die bestaat
+                if (sample.age && sample.age.trim() !== "") {
                     const ageText = sample.age.replace(/\s*years\s*/gi, "").trim();
                     sampleHTML += `<p><strong>Leeftijd:</strong> <span class="sample-age">${ageText ? ageText + " years" : ""}</span></p>`;
                 } else {
-                    sampleHTML += `<p><strong>Leeftijd:</strong> <span class="sample-age"></span></p>`;
+                    sampleHTML += `<p style="display:none;"><strong>Leeftijd:</strong> <span class="sample-age"></span></p>`;
                 }
                 
-                sampleHTML += `<p><strong>Type:</strong> <span class="sample-type">${sample.type || ""}</span></p>`;
-                sampleHTML += `<p><strong>Cask:</strong> <span class="sample-cask">${sample.cask || ""}</span></p>`;
-                sampleHTML += `<p><strong>Grootte:</strong> <span class="sample-size">${sample.size || ""}</span> cl</p>`;
-                sampleHTML += `<p><strong>Prijs:</strong> €&nbsp;<span class="sample-value">${parseFloat(sample.value || 0).toFixed(2)}</span></p>`;
-                sampleHTML += `<p><strong>Opmerkingen:</strong> <span class="sample-notes">${sample.notes || ""}</span></p>`;
-                
-                // Correcte weergave van de Whiskybase-link
-                if (sample.whiskyBaseLink) {
-                    sampleHTML += `<p><a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer" class="sample-whiskyBaseLink">Whiskybase</a></p>`;
+                // Voeg type toe als die bestaat
+                if (sample.type && sample.type.trim() !== "") {
+                    sampleHTML += `<p><strong>Type:</strong> <span class="sample-type">${sample.type}</span></p>`;
                 } else {
-                    sampleHTML += `<p><span class="sample-whiskyBaseLink"></span></p>`;
+                    sampleHTML += `<p style="display:none;"><strong>Type:</strong> <span class="sample-type"></span></p>`;
+                }
+                
+                // Voeg cask toe als die bestaat
+                if (sample.cask && sample.cask.trim() !== "") {
+                    sampleHTML += `<p><strong>Cask:</strong> <span class="sample-cask">${sample.cask}</span></p>`;
+                } else {
+                    sampleHTML += `<p style="display:none;"><strong>Cask:</strong> <span class="sample-cask"></span></p>`;
+                }
+                
+                // Voeg altijd grootte toe (verplicht veld)
+                sampleHTML += `<p><strong>Grootte:</strong> <span class="sample-size">${sample.size || ""}</span> cl</p>`;
+                
+                // Voeg altijd prijs toe (verplicht veld)
+                sampleHTML += `<p><strong>Prijs:</strong> €&nbsp;<span class="sample-value">${parseFloat(sample.value || 0).toFixed(2)}</span></p>`;
+                
+                // Voeg opmerkingen toe als die bestaan
+                if (sample.notes && sample.notes.trim() !== "") {
+                    sampleHTML += `<p><strong>Opmerkingen:</strong> <span class="sample-notes">${sample.notes}</span></p>`;
+                } else {
+                    sampleHTML += `<p style="display:none;"><strong>Opmerkingen:</strong> <span class="sample-notes"></span></p>`;
+                }
+                
+                // Voeg whiskybase link toe als die bestaat
+                if (sample.whiskyBaseLink && sample.whiskyBaseLink.trim() !== "") {
+                    sampleHTML += `<p><strong>Link naar Whiskybase:</strong> <a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer" class="sample-whiskyBaseLink">Whiskybase</a></p>`;
+                } else {
+                    sampleHTML += `<p style="display:none;"><strong>Link naar Whiskybase:</strong> <span class="sample-whiskyBaseLink"></span></p>`;
                 }
                 
                 // Voor gasten zijn er geen bewerkingsknoppen
@@ -308,19 +354,19 @@ function enableEditMode(docId) {
     const notesElement = sampleElement.querySelector(".sample-notes");
     
     // Controleer of alle elementen gevonden zijn
-    if (!nameElement || !ageElement || !typeElement || !caskElement || !sizeElement || !valueElement || !notesElement) {
-        console.error("❌ Niet alle velden gevonden voor sample:", docId);
+    if (!nameElement || !sizeElement || !valueElement) {
+        console.error("❌ Niet alle verplichte velden gevonden voor sample:", docId);
         return;
     }
     
     // Bereid de waarden voor (verwijder eventuele labels en eenheden)
     const name = nameElement.innerText.trim();
-    const age = ageElement.innerText.replace(/\s*years\s*/gi, "").trim();
-    const type = typeElement.innerText.trim();
-    const cask = caskElement.innerText.trim();
+    const age = ageElement ? ageElement.innerText.replace(/\s*years\s*/gi, "").trim() : "";
+    const type = typeElement ? typeElement.innerText.trim() : "";
+    const cask = caskElement ? caskElement.innerText.trim() : "";
     const size = sizeElement.innerText.trim();
     const value = valueElement.innerText.trim();
-    const notes = notesElement.innerText.trim();
+    const notes = notesElement ? notesElement.innerText.trim() : "";
     
     // Haal Whiskybase link op (als die er is)
     let whiskyBaseLinkElement = sampleElement.querySelector(".sample-whiskyBaseLink");
@@ -330,21 +376,48 @@ function enableEditMode(docId) {
         const linkElement = whiskyBaseLinkElement.querySelector("a");
         if (linkElement) {
             whiskyBaseLink = linkElement.getAttribute("href");
+        } else if (whiskyBaseLinkElement.tagName === "A") {
+            whiskyBaseLink = whiskyBaseLinkElement.getAttribute("href");
         }
     }
     
     // Vervang de tekst door invoervelden
     nameElement.innerHTML = `<input type="text" value="${name}" class="edit-input">`;
-    ageElement.innerHTML = `<input type="text" value="${age}" class="edit-input">`;
-    typeElement.innerHTML = `<input type="text" value="${type}" class="edit-input">`;
-    caskElement.innerHTML = `<input type="text" value="${cask}" class="edit-input">`;
+    
+    // Toon alle velden tijdens het bewerken, zelfs als ze leeg zijn
+    const parentElements = sampleElement.querySelectorAll("p");
+    parentElements.forEach(p => p.style.display = "block");
+    
+    if (ageElement) {
+        ageElement.innerHTML = `<input type="text" value="${age}" class="edit-input">`;
+    }
+    
+    if (typeElement) {
+        typeElement.innerHTML = `<input type="text" value="${type}" class="edit-input">`;
+    }
+    
+    if (caskElement) {
+        caskElement.innerHTML = `<input type="text" value="${cask}" class="edit-input">`;
+    }
+    
     sizeElement.innerHTML = `<input type="number" value="${size}" class="edit-input" min="1">`;
     valueElement.innerHTML = `<input type="text" value="${value}" class="edit-input">`;
-    notesElement.innerHTML = `<textarea class="edit-input" oninput="autoResize(this)">${notes}</textarea>`;
+    
+    if (notesElement) {
+        notesElement.innerHTML = `<textarea class="edit-input" oninput="autoResize(this)">${notes}</textarea>`;
+    }
     
     // Hulpfunctie om de Whiskybase link te bewerken - als platte tekst
     if (whiskyBaseLinkElement) {
-        whiskyBaseLinkElement.innerHTML = `<span>Link naar Whiskybase:</span> <input type="url" value="${whiskyBaseLink}" class="edit-input" placeholder="Link naar Whiskybase">`;
+        // Vind het parent element (p) voor de whiskybase link
+        const parentElement = whiskyBaseLinkElement.closest('p');
+        if (parentElement) {
+            // Maak een nieuw element aan om 'Link naar Whiskybase:' te tonen, maar niet klikbaar
+            parentElement.innerHTML = `
+                <strong>Link naar Whiskybase:</strong> 
+                <input type="url" value="${whiskyBaseLink}" class="edit-input" placeholder="Link naar Whiskybase">
+            `;
+        }
     }
     
     // Verberg alle knoppen en maak nieuwe knoppen
@@ -407,7 +480,11 @@ function saveSample(docId) {
     const sizeInput = sampleElement.querySelector(".sample-size input");
     const valueInput = sampleElement.querySelector(".sample-value input");
     const notesTextarea = sampleElement.querySelector(".sample-notes textarea");
-    const whiskyBaseLinkInput = sampleElement.querySelector(".sample-whiskyBaseLink input");
+    
+    // Zoek de whiskybase link input in het juiste parent element
+    const whiskyBaseLinkParent = Array.from(sampleElement.querySelectorAll("p")).find(p => 
+        p.textContent.includes("Link naar Whiskybase"));
+    const whiskyBaseLinkInput = whiskyBaseLinkParent ? whiskyBaseLinkParent.querySelector("input") : null;
     
     if (!nameInput || !sizeInput || !valueInput) {
         console.error("❌ Verplichte velden niet gevonden bij opslaan:", docId);
