@@ -337,14 +337,14 @@ function enableEditMode(docId) {
         whiskyBaseLink = whiskyBaseLinkElement.getAttribute("href");
     }
     
-    // Maak bewerkingsvelden voor alle velden
+    // Maak bewerkingsvelden voor alle velden met sterretjes voor verplichte velden
     let editHTML = `<div class="edit-form">`;
-    editHTML += `<p><strong>Whisky:</strong> <input type="text" class="edit-input edit-name" value="${name}"></p>`;
+    editHTML += `<p><strong class="required">Whisky:</strong> <input type="text" class="edit-input edit-name" value="${name}"></p>`;
     editHTML += `<p><strong>Leeftijd:</strong> <input type="text" class="edit-input edit-age" value="${age}"></p>`;
     editHTML += `<p><strong>Type:</strong> <input type="text" class="edit-input edit-type" value="${type}"></p>`;
     editHTML += `<p><strong>Cask:</strong> <input type="text" class="edit-input edit-cask" value="${cask}"></p>`;
-    editHTML += `<p><strong>Grootte:</strong> <input type="number" class="edit-input edit-size" value="${size}" min="1"></p>`;
-    editHTML += `<p><strong>Prijs:</strong> <input type="text" class="edit-input edit-value" value="${value}"></p>`;
+    editHTML += `<p><strong class="required">Grootte:</strong> <input type="number" class="edit-input edit-size" value="${size}" min="1"></p>`;
+    editHTML += `<p><strong class="required">Prijs:</strong> <input type="text" class="edit-input edit-value" value="${value}"></p>`;
     editHTML += `<p><strong>Opmerkingen:</strong> <textarea class="edit-input edit-notes" oninput="autoResize(this)">${notes}</textarea></p>`;
     editHTML += `<p><strong>Link naar Whiskybase:</strong> <input type="url" class="edit-input edit-whiskybase" value="${whiskyBaseLink}"></p>`;
     
