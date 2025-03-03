@@ -257,7 +257,7 @@ function addSample() {
     
     // Valideer verplichte velden
     if (!whiskyName || !whiskySize || !whiskyValue) {
-        alert("❌ Vul ten minste de whisky naam, grootte en prijs in.");
+        alert("❌ Vul in ieder geval de whisky naam, grootte en prijs in.");
         return;
     }
     
