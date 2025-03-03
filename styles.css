@@ -214,3 +214,9 @@ textarea.edit-input {
 [id^="delete-btn-"]:hover {
     background-color: #c0392b;
 }
+
+.required::after {
+    content: " *";
+    color: #ff9900; /* Dezelfde oranje kleur als de knoppen */
+    font-weight: bold;
+}
