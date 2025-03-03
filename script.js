@@ -132,9 +132,11 @@ function loadSamples(user) {
                 const isOwner = sample.userId === user.uid;
                 
                 let sampleHTML = `<div id="sample-${doc.id}" class="sample-card">`;
+                
+                // Voeg de velden toe die altijd getoond moeten worden
                 sampleHTML += `<p><strong>Whisky:</strong> <span class="sample-name">${sample.name || ""}</span></p>`;
                 
-                // Toon alleen niet-lege velden
+                // Voeg optionele velden toe als ze bestaan
                 if (sample.age && sample.age.trim()) {
                     const ageText = sample.age.replace(/\s*years\s*/gi, "").trim();
                     sampleHTML += `<p><strong>Leeftijd:</strong> <span class="sample-age">${ageText ? ageText + " years" : ""}</span></p>`;
@@ -155,11 +157,14 @@ function loadSamples(user) {
                     sampleHTML += `<p><strong>Opmerkingen:</strong> <span class="sample-notes">${sample.notes}</span></p>`;
                 }
                 
-                // Alleen de Whiskybase link toevoegen zonder enige extra tekst ervoor
+                // Whiskybase link ZONDER label
                 if (sample.whiskyBaseLink && sample.whiskyBaseLink.trim()) {
-                    sampleHTML += `<p><a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer" class="sample-whiskyBaseLink">Whiskybase</a></p>`;
+                    sampleHTML += `<p class="whiskybase-link-container">
+                                       <a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer" class="sample-whiskyBaseLink">Whiskybase</a>
+                                   </p>`;
                 }
                 
+                // Voeg knoppen toe voor de eigenaar
                 if (isOwner) {
                     sampleHTML += `
                         <div class="sample-buttons">
@@ -197,9 +202,11 @@ function loadSamplesForGuests() {
                 const sample = doc.data();
                 
                 let sampleHTML = `<div id="sample-${doc.id}" class="sample-card">`;
+                
+                // Voeg de velden toe die altijd getoond moeten worden
                 sampleHTML += `<p><strong>Whisky:</strong> <span class="sample-name">${sample.name || ""}</span></p>`;
                 
-                // Toon alleen niet-lege velden
+                // Voeg optionele velden toe als ze bestaan
                 if (sample.age && sample.age.trim()) {
                     const ageText = sample.age.replace(/\s*years\s*/gi, "").trim();
                     sampleHTML += `<p><strong>Leeftijd:</strong> <span class="sample-age">${ageText ? ageText + " years" : ""}</span></p>`;
@@ -220,9 +227,11 @@ function loadSamplesForGuests() {
                     sampleHTML += `<p><strong>Opmerkingen:</strong> <span class="sample-notes">${sample.notes}</span></p>`;
                 }
                 
-                // Alleen de Whiskybase link toevoegen zonder enige extra tekst ervoor
+                // Whiskybase link ZONDER label
                 if (sample.whiskyBaseLink && sample.whiskyBaseLink.trim()) {
-                    sampleHTML += `<p><a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer" class="sample-whiskyBaseLink">Whiskybase</a></p>`;
+                    sampleHTML += `<p class="whiskybase-link-container">
+                                       <a href="${sample.whiskyBaseLink}" target="_blank" rel="noopener noreferrer" class="sample-whiskyBaseLink">Whiskybase</a>
+                                   </p>`;
                 }
                 
                 sampleHTML += `</div>`;
