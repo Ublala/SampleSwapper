@@ -456,9 +456,32 @@ window.onload = () => {
         });
     });
     
+    // Voeg sterretjes toe aan de placeholders van verplichte velden
+    addRequiredIndicators();
+    
     // Controleer gebruikersstatus
     checkUser();
 };
+
+// Functie om sterretjes toe te voegen aan de placeholders van verplichte velden
+function addRequiredIndicators() {
+    // Voeg sterretje toe aan placeholders in het formulier
+    const requiredFields = document.querySelectorAll('[required]');
+    requiredFields.forEach(field => {
+        if (field.placeholder && !field.placeholder.includes('*')) {
+            field.placeholder += ' *';
+        }
+    });
+    
+    // Voeg ook de sterretjes toe aan de veldlabels
+    document.querySelectorAll('strong').forEach(label => {
+        if (label.nextElementSibling && 
+            label.nextElementSibling.hasAttribute('required') && 
+            !label.classList.contains('required')) {
+            label.classList.add('required');
+        }
+    });
+}
 
 // Zorg ervoor dat alle functies beschikbaar zijn in het window-object
 window.register = register;
@@ -471,5 +494,6 @@ window.cancelEdit = cancelEdit;
 window.saveSample = saveSample;
 window.deleteSample = deleteSample;
 window.autoResize = autoResize;
+window.addRequiredIndicators = addRequiredIndicators;
 
 console.log("✅ Script is volledig geladen!");
