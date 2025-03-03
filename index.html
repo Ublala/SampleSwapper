@@ -27,15 +27,31 @@
     <!-- Formulier om een sample toe te voegen -->
     <div id="addSampleForm" style="display: none;">
         <h2>Voeg nieuw sample toe</h2>
-        <!-- Aangepaste veldvolgorde zoals verzocht -->
-        <input type="text" id="whiskyName" placeholder="Whisky" required>
-        <input type="text" id="whiskyAge" placeholder="Leeftijd">
-        <input type="text" id="whiskyType" placeholder="Type">
-        <input type="text" id="whiskyCask" placeholder="Cask">
-        <input type="number" id="whiskySize" placeholder="Grootte van het sample (cl)" min="1" required>
-        <input type="text" id="whiskyValue" placeholder="Prijs (€)" required>
-        <textarea id="whiskyNotes" placeholder="Opmerkingen of beschrijving" oninput="autoResize(this)"></textarea>
-        <input type="url" id="whiskyBaseLink" placeholder="Link naar Whiskybase">
+        
+        <p><label for="whiskyName" class="required">Whisky</label></p>
+        <input type="text" id="whiskyName" required>
+        
+        <p><label for="whiskyAge">Leeftijd</label></p>
+        <input type="text" id="whiskyAge">
+        
+        <p><label for="whiskyType">Type</label></p>
+        <input type="text" id="whiskyType">
+        
+        <p><label for="whiskyCask">Cask</label></p>
+        <input type="text" id="whiskyCask">
+        
+        <p><label for="whiskySize" class="required">Grootte (cl)</label></p>
+        <input type="number" id="whiskySize" min="1" required>
+        
+        <p><label for="whiskyValue" class="required">Prijs (€)</label></p>
+        <input type="text" id="whiskyValue" required>
+        
+        <p><label for="whiskyNotes">Opmerkingen</label></p>
+        <textarea id="whiskyNotes" oninput="autoResize(this)"></textarea>
+        
+        <p><label for="whiskyBaseLink">Link naar Whiskybase</label></p>
+        <input type="url" id="whiskyBaseLink">
+        
         <button onclick="addSample()">Voeg Sample Toe</button>
     </div>
 
