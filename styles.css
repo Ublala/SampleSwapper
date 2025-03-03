@@ -221,3 +221,8 @@ textarea.edit-input {
     color: #ff9900; /* Dezelfde oranje kleur als de knoppen */
     font-weight: bold;
 }
+
+/* Styling voor placeholder sterretjes - dit is voor custom pseudo-element support indien nodig */
+::placeholder {
+    color: #999;
+}
